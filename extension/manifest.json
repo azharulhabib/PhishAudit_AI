@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "PhishAudit AI",
+  "version": "1.0",
+  "description": "Forensic URL Auditor",
+  "permissions": ["webNavigation"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
