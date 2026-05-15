@@ -25,15 +25,18 @@ def home():
 
 @app.post("/audit")
 async def audit_url(request: URLAuditRequest, db: Session = Depends(get_db)):
-    is_suspicious = "phish" in request.url.lower() or "test" in request.url.lower()
+    # This will be replaced with real ML in Sprint 2
+    suspicious_keywords = ["phish", "login", "verify", "secure", "account", "update", "confirm", "bank"]
+    is_suspicious = any(kw in request.url.lower() for kw in suspicious_keywords)
     status = "Phishing" if is_suspicious else "Safe"
-    score = 0.98 if is_suspicious else 0.01
+    score = 0.95 if is_suspicious else 0.05
     
-    # Save audit log to database
+    #  Save to database
     audit_log = AuditLog(
         url=request.url,
         result=status,
-        score=score
+        score=score,
+        features_used=None
     )
     db.add(audit_log)
     db.commit()
