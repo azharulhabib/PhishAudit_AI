@@ -83,7 +83,6 @@ def extract_features(url: str) -> dict:
         return {k: 0 for k in FEATURE_ORDER}
 
     features = {
-        # ── Basic character counts ──
         'url_len':          len(url),
         '@':                url.count('@'),
         '?':                url.count('?'),
