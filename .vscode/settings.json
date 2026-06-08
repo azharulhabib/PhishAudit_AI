@@ -1,0 +1,6 @@
+{
+    "python.defaultInterpreterPath": "/Users/azharulhabib/Downloads/Projects/PhishAudit_AI/backend/venv/bin/python",
+    "python.analysis.extraPaths": [
+        "/Users/azharulhabib/Downloads/Projects/PhishAudit_AI/backend/venv/lib/python3.11/site-packages"
+    ]
+}

@@ -4,6 +4,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from connection import SessionLocal, engine, get_db
 from database.models import AuditLog, Base
+from ml_engine import predict
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -11,7 +13,7 @@ app = FastAPI(title="PhishAudit AI API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -21,22 +23,24 @@ class URLAuditRequest(BaseModel):
 
 @app.get("/")
 def home():
-    return {"status": "Online", "message": "PhishAudit AI Backend is Running"}
+    return {
+        "status": "online",
+        "service": "PhishAudit AI API"
+    }
 
 @app.post("/audit")
-async def audit_url(request: URLAuditRequest, db: Session = Depends(get_db)):
-    # This will be replaced with real ML in Sprint 2
-    suspicious_keywords = ["phish", "login", "verify", "secure", "account", "update", "confirm", "bank"]
-    is_suspicious = any(kw in request.url.lower() for kw in suspicious_keywords)
-    status = "Phishing" if is_suspicious else "Safe"
-    score = 0.95 if is_suspicious else 0.05
-    
-    #  Save to database
+async def audit_url(
+    request: URLAuditRequest,
+    db: Session = Depends(get_db)
+):
+    result = predict(request.url)
+
+
     audit_log = AuditLog(
         url=request.url,
-        result=status,
-        score=score,
-        features_used=None
+        result=result["status"],
+        score=result["score"],
+        features_used=result["features"]
     )
     db.add(audit_log)
     db.commit()
@@ -44,8 +48,12 @@ async def audit_url(request: URLAuditRequest, db: Session = Depends(get_db)):
 
     return {
         "url": request.url,
-        "status": status,
-        "score": audit_log.score,
+        "status": result["status"],
+        "score": result["score"],
         "db_id": audit_log.id,
-        "recommendation": "Block" if is_suspicious else "Allow"
+        "recommendation": (
+            "block" if result["status"] == "Phishing"
+            else "allow"
+        ),
+        "error": result.get("error")
     }

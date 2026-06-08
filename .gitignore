@@ -4,3 +4,5 @@ node_modules/
 .env
 dist/
 *.pycbackend/data/
+backend/models/
+.DS_Store
