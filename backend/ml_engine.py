@@ -1,4 +1,5 @@
 import pickle
+import pandas as pd
 from feature_extractor import extract_features, features_to_vector
 
 try:
@@ -10,23 +11,18 @@ try:
 
 except FileNotFoundError as e:
     raise RuntimeError(
-        "Model files not found."
+        "Model files not found. Run train_model.py before starting the server."
     ) from e
 
 
 def predict(url: str) -> dict:
-    if MODEL is None:
-        return {
-            "status": "Error",
-            "score": 0.0,
-            "features": {},
-            "error": "Model unavailable."
-        }
-
     try:
         features = extract_features(url)
         vector = features_to_vector(features)
-        score = float(MODEL.predict_proba([vector])[0][1])
+        # Pass as DataFrame to preserve feature names
+        df = pd.DataFrame([vector], columns=FEATURE_COLUMNS)
+        score = float(MODEL.predict_proba(df)[0][1])
+
         status = "Phishing" if score >= 0.5 else "Safe"
 
         return {
@@ -37,7 +33,6 @@ def predict(url: str) -> dict:
         }
 
     except Exception as e:
-        print(f"Prediction failed for URL '{url}': {e}")
         return {
             "status": "Error",
             "score": 0.0,

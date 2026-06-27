@@ -72,38 +72,47 @@ def extract_features(url: str) -> dict:
         hostname = parsed.hostname or ""
         path = parsed.path or ""
         query = parsed.query or ""
-        full = url.lower()
+        url_no_protocol = re.sub(r'^https?://', '', url)
+        full = url_no_protocol.lower()
+
+
         domain_parts = hostname.split(".")
         tld = "." + domain_parts[-1] if domain_parts else ""
-        subdomain_parts = domain_parts[:-2] if len(domain_parts) > 2 else []
-        tokens = re.split(r'[/\-_.?=&%#+]', url)
+        subdomain_parts = (
+            domain_parts[:-2] if len(domain_parts) > 2 else []
+        )
+        tokens = re.split(r'[/\-_.?=&%#+]', url_no_protocol)
         tokens = [t for t in tokens if t]
 
     except Exception:
         return {k: 0 for k in FEATURE_ORDER}
 
     features = {
-        'url_len':          len(url),
-        '@':                url.count('@'),
-        '?':                url.count('?'),
-        '-':                url.count('-'),
-        '=':                url.count('='),
-        '.':                url.count('.'),
-        '#':                url.count('#'),
-        '%':                url.count('%'),
-        '+':                url.count('+'),
-        '$':                url.count('$'),
-        '!':                url.count('!'),
-        '*':                url.count('*'),
-        ',':                url.count(','),
-        '//':               url.count('//'),
-        'digits':           sum(c.isdigit() for c in url),
-        'letters':          sum(c.isalpha() for c in url),
+        'url_len':               len(url_no_protocol),
+        '@':                     url_no_protocol.count('@'),
+        '?':                     url_no_protocol.count('?'),
+        '-':                     url_no_protocol.count('-'),
+        '=':                     url_no_protocol.count('='),
+        '.':                     url_no_protocol.count('.'),
+        '#':                     url_no_protocol.count('#'),
+        '%':                     url_no_protocol.count('%'),
+        '+':                     url_no_protocol.count('+'),
+        '$':                     url_no_protocol.count('$'),
+        '!':                     url_no_protocol.count('!'),
+        '*':                     url_no_protocol.count('*'),
+        ',':                     url_no_protocol.count(','),
+        '//':                    url_no_protocol.count('//'),
+        'digits':                sum(
+            c.isdigit() for c in url_no_protocol
+        ),
+        'letters':               sum(
+            c.isalpha() for c in url_no_protocol
+        ),
 
-        'https':            1 if parsed.scheme == 'https' else 0,
-        'having_ip_address': _has_ip(hostname),
-        'abnormal_url':     _is_abnormal(url, hostname),
-        'Shortining_Service': 1 if any(
+        'https':                 1 if parsed.scheme == 'https' else 0,
+        'having_ip_address':     _has_ip(hostname),
+        'abnormal_url':          _is_abnormal(url_no_protocol, hostname),
+        'Shortining_Service':    1 if any(
             s in hostname for s in SHORTENERS
         ) else 0,
 
@@ -117,23 +126,27 @@ def extract_features(url: str) -> dict:
         'phish_brand_in_path': 1 if any(
             b in path.lower() for b in BRANDS
         ) else 0,
-        'phish_hyphen_count':   url.count('-'),
-        'phish_digit_count':    sum(c.isdigit() for c in url),
-        'phish_long_domain':    1 if len(hostname) > 20 else 0,
+        'phish_hyphen_count':    url_no_protocol.count('-'),
+        'phish_digit_count':     sum(
+            c.isdigit() for c in url_no_protocol
+        ),
+        'phish_long_domain':     1 if len(hostname) > 20 else 0,
         'phish_many_subdomains': 1 if len(subdomain_parts) > 2 else 0,
         'phish_suspicious_tld': 1 if tld in SUSPICIOUS_TLDS else 0,
         'phish_keyword_count':  sum(
             1 for k in PHISHING_KEYWORDS if k in full
         ),
-        'phish_has_redirect':   1 if url.count('http') > 1 else 0,
-        'phish_param_count':    len(parse_qs(query)),
-        'phish_encoded_chars':  len(re.findall(r'%[0-9a-fA-F]{2}', url)),
+        'phish_has_redirect':    1 if url_no_protocol.count('http') > 0 else 0,
+        'phish_param_count':     len(parse_qs(query)),
+        'phish_encoded_chars':   len(
+            re.findall(r'%[0-9a-fA-F]{2}', url_no_protocol)
+        ),
 
         'adv_domain_ngram_entropy': _entropy(hostname),
         'adv_path_entropy':         _entropy(path),
         'adv_digit_ratio':          sum(
-            c.isdigit() for c in url
-        ) / len(url) if url else 0,
+            c.isdigit() for c in url_no_protocol
+        ) / len(url_no_protocol) if url_no_protocol else 0,
         'adv_subdomain_count':      len(subdomain_parts),
         'adv_token_count':          len(tokens),
     }

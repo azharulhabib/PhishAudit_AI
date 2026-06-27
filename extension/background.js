@@ -1,4 +1,4 @@
-chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+chrome.webNavigation.onCommitted.addListener((details) => {
     if (details.frameId === 0) {
         const targetUrl = details.url;
         if (
@@ -9,7 +9,7 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
             return;
         }
 
-        console.log("[PhishAudit] Intercepted URL:", targetUrl);
+        console.log("[PhishAudit] Auditing URL:", targetUrl);
 
         fetch("http://localhost:8000/audit", {
             method: "POST",
@@ -18,23 +18,22 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
         })
         .then(response => response.json())
         .then(data => {
-            console.log("[PhishAudit] Server Response:", data);
+            console.log("[PhishAudit] Audit result:", data);
 
             if (data.status === "Phishing") {
                 //notify user
                 chrome.notifications.create({
                     type: "basic",
-                    iconUrl: "icons/icon48.png",
-                    title: "⚠️ PhishAudit Warning",
-                    message: `Suspicious URL detected!\n${targetUrl}\nRisk Score: ${(data.score * 100).toFixed(0)}%`
+                    title: "PhishAudit Warning",
+                    message: `Suspicious URL detected.\nRisk Score: ${(data.score * 100).toFixed(0)}%`
                 });
-                console.warn("[PhishAudit] PHISHING DETECTED:", targetUrl);
+                console.warn("[PhishAudit] Phishing detected:", targetUrl);
             } else {
                 console.log("[PhishAudit] Safe:", targetUrl);
             }
         })
-        .catch(error => {
-            console.warn("[PhishAudit] Backend unavailable:", error.message);
+        .catch(() => {
+            console.warn("[PhishAudit] Backend unavailable.");
         });
     }
 });
