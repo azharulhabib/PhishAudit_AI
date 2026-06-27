@@ -19,9 +19,28 @@ chrome.webNavigation.onCommitted.addListener((details) => {
         .then(response => response.json())
         .then(data => {
             console.log("[PhishAudit] Audit result:", data);
+            chrome.storage.local.set({
+                lastAudit: {
+                    url: data.url,
+                    status: data.status,
+                    score: data.score,
+                    recommendation: data.recommendation,
+                    timestamp: new Date().toISOString()
+                }
+            });
 
+            const badgeText = data.status === "Phishing" ? "!" : "";
+            const badgeColor = data.status === "Phishing" ? "#e53e3e" : "#38a169";
+
+            chrome.action.setBadgeText({
+                text: badgeText,
+                tabId: details.tabId
+            });
+            chrome.action.setBadgeBackgroundColor({
+                color: badgeColor,
+                tabId: details.tabId
+            });
             if (data.status === "Phishing") {
-                //notify user
                 chrome.notifications.create({
                     type: "basic",
                     title: "PhishAudit Warning",
@@ -34,6 +53,16 @@ chrome.webNavigation.onCommitted.addListener((details) => {
         })
         .catch(() => {
             console.warn("[PhishAudit] Backend unavailable.");
+
+            chrome.storage.local.set({
+                lastAudit: {
+                    url: targetUrl,
+                    status: "Unknown",
+                    score: null,
+                    recommendation: "unavailable",
+                    timestamp: new Date().toISOString()
+                }
+            });
         });
     }
 });

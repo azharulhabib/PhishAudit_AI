@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishAudit AI</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+
+        <div class="header">
+            <img src="icons/icon48.png" alt="PhishAudit AI" class="logo">
+            <div class="header-text">
+                <h1>PhishAudit AI</h1>
+                <p>Real-time phishing detection</p>
+            </div>
+        </div>
+
+        <div class="status-card" id="statusCard">
+            <div class="status-indicator" id="statusIndicator"></div>
+            <div class="status-content">
+                <div class="status-label" id="statusLabel">Scanning...</div>
+                <div class="status-score" id="statusScore"></div>
+            </div>
+        </div>
+
+        <div class="url-box">
+            <span class="url-label">Audited URL</span>
+            <span class="url-text" id="urlText">—</span>
+        </div>
+
+        <div class="score-section" id="scoreSection" style="display:none">
+            <span class="score-label">Risk Score</span>
+            <div class="score-bar-container">
+                <div class="score-bar" id="scoreBar"></div>
+            </div>
+            <span class="score-value" id="scoreValue"></span>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-trust" id="btnTrust">
+                Trust This Site
+            </button>
+            <button class="btn btn-report" id="btnReport">
+                Report False Positive
+            </button>
+        </div>
+
+        <div class="footer">
+            <span id="timestamp"></span>
+        </div>
+
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
