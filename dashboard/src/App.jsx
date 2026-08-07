@@ -1,121 +1,174 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from "react";
+import axios from "axios";
+import "./App.css";
+import Header from "./components/Header";
+import StatsCard from "./components/StatsCard";
+import AuditTable from "./components/AuditTable";
+import MetricsChart from "./components/MetricsChart";
 
-function App() {
-  const [count, setCount] = useState(0)
+const API = "http://localhost:8000";
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+export default function App() {
+    const [logs, setLogs]       = useState([]);
+    const [metrics, setMetrics] = useState(null);
+    const [stats, setStats]     = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchData();
+        const interval = setInterval(fetchData, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
+    async function fetchData() {
+        try {
+            const [logsRes, metricsRes] = await Promise.all([
+                axios.get(`${API}/logs`),
+                axios.get(`${API}/metrics`)
+            ]);
+
+            const logsData = logsRes.data.logs || [];
+            setLogs(logsData);
+            setMetrics(metricsRes.data);
+
+            const total    = logsData.length;
+            const phishing = logsData.filter(
+                l => l.result === "Phishing"
+            ).length;
+            const safe     = total - phishing;
+            const avgScore = total > 0
+                ? (logsData.reduce((s, l) => s + (l.score || 0), 0) / total)
+                : 0;
+
+            setStats({ total, phishing, safe, avgScore });
+        } catch (err) {
+            console.error("Failed to fetch dashboard data:", err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <div className="dashboard">
+            <Header />
+            <main className="main-content">
+
+                {/* Stats Row */}
+                <div className="stats-grid">
+                    <StatsCard
+                        label="Total Audits"
+                        value={stats?.total ?? "—"}
+                        sub="All URLs audited"
+                        color="blue"
+                    />
+                    <StatsCard
+                        label="Phishing Detected"
+                        value={stats?.phishing ?? "—"}
+                        sub="Flagged as malicious"
+                        color="red"
+                    />
+                    <StatsCard
+                        label="Safe URLs"
+                        value={stats?.safe ?? "—"}
+                        sub="Passed audit"
+                        color="green"
+                    />
+                    <StatsCard
+                        label="Avg Risk Score"
+                        value={
+                            stats?.avgScore != null
+                                ? `${Math.round(stats.avgScore * 100)}%`
+                                : "—"
+                        }
+                        sub="Across all audits"
+                        color="yellow"
+                    />
+                </div>
+
+
+                <div className="charts-row">
+                    <div className="panel">
+                        <div className="panel-title">
+                            Model Performance Metrics
+                        </div>
+                        {loading
+                            ? <div className="loading">Loading...</div>
+                            : <MetricsChart metrics={metrics} />
+                        }
+                    </div>
+
+                    <div className="panel">
+                        <div className="panel-title">
+                            Detection Summary
+                        </div>
+                        <div style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "12px",
+                            marginTop: "8px"
+                        }}>
+                            {[
+                                {
+                                    label: "Phishing Rate",
+                                    value: stats?.total
+                                        ? Math.round(
+                                            (stats.phishing / stats.total) * 100
+                                          )
+                                        : 0,
+                                    color: "var(--accent-red)"
+                                },
+                                {
+                                    label: "Safe Rate",
+                                    value: stats?.total
+                                        ? Math.round(
+                                            (stats.safe / stats.total) * 100
+                                          )
+                                        : 0,
+                                    color: "var(--accent-green)"
+                                },
+                            ].map((item) => (
+                                <div key={item.label}>
+                                    <div style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        marginBottom: "6px",
+                                        fontSize: "12px",
+                                        color: "var(--text-secondary)"
+                                    }}>
+                                        <span>{item.label}</span>
+                                        <span>{item.value}%</span>
+                                    </div>
+                                    <div style={{
+                                        height: "6px",
+                                        background: "var(--border)",
+                                        borderRadius: "3px",
+                                        overflow: "hidden"
+                                    }}>
+                                        <div style={{
+                                            width: `${item.value}%`,
+                                            height: "100%",
+                                            background: item.color,
+                                            borderRadius: "3px",
+                                            transition: "width 0.5s ease"
+                                        }} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="panel">
+                    <div className="panel-title">
+                        Recent Audit Logs
+                    </div>
+                    {loading
+                        ? <div className="loading">Loading...</div>
+                        : <AuditTable logs={logs.slice(0, 50)} />
+                    }
+                </div>
+
+            </main>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    );
 }
-
-export default App
