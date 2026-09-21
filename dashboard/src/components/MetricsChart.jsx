@@ -4,8 +4,13 @@ import {
 } from "recharts";
 
 export default function MetricsChart({ metrics }) {
-    if (!metrics) {
-        return <div className="empty-state">No metrics available.</div>;
+    if (!metrics || !metrics.available) {
+        return (
+            <div className="empty-state">
+                No metrics recorded yet. Run train_model.py
+                and seed the model_metrics table.
+            </div>
+        );
     }
 
     const data = [
