@@ -1,5 +1,6 @@
 import re
 import math
+import urllib.parse
 from urllib.parse import urlparse, parse_qs
 
 FEATURE_ORDER = [
@@ -41,6 +42,29 @@ PHISHING_KEYWORDS = [
     "authorize", "authenticate", "recover", "unlock", "urgent"
 ]
 
+def _normalize_url(url: str) -> str:
+    try:
+        url = urllib.parse.unquote(url)
+    except Exception:
+        pass
+    return url
+
+
+def _normalize_hostname(hostname: str) -> str:
+    if not hostname:
+        return hostname
+    try:
+        hostname = hostname.encode('ascii').decode('idna')
+    except Exception:
+        pass
+    try:
+        if hostname.startswith('xn--'):
+            hostname = hostname.encode('ascii').decode('idna')
+    except Exception:
+        pass
+    return hostname.lower()
+
+
 
 def _entropy(text: str) -> float:
     if not text:
@@ -68,10 +92,13 @@ def _is_abnormal(url: str, hostname: str) -> int:
 
 def extract_features(url: str) -> dict:
     try:
+        url = _normalize_url(url)
         parsed = urlparse(url)
-        hostname = parsed.hostname or ""
+        raw_hostname = parsed.hostname or ""
+        hostname = _normalize_hostname(raw_hostname)
         path = parsed.path or ""
         query = parsed.query or ""
+
         url_no_protocol = re.sub(r'^https?://', '', url)
         full = url_no_protocol.lower()
 
@@ -102,13 +129,9 @@ def extract_features(url: str) -> dict:
         '*':                     url_no_protocol.count('*'),
         ',':                     url_no_protocol.count(','),
         '//':                    url_no_protocol.count('//'),
-        'digits':                sum(
-            c.isdigit() for c in url_no_protocol
-        ),
-        'letters':               sum(
-            c.isalpha() for c in url_no_protocol
-        ),
 
+        'digits':                sum(c.isdigit() for c in url_no_protocol),
+        'letters':               sum(c.isalpha() for c in url_no_protocol),
         'https':                 1 if parsed.scheme == 'https' else 0,
         'having_ip_address':     _has_ip(hostname),
         'abnormal_url':          _is_abnormal(url_no_protocol, hostname),
