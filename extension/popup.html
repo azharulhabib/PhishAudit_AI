@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,18 +10,25 @@
     <div class="container">
 
         <div class="header">
-            <img src="icons/icon48.png" alt="PhishAudit AI" class="logo">
-            <div class="header-text">
-                <h1>PhishAudit AI</h1>
-                <p>Real-time phishing detection</p>
+            <div class="header-left">
+                <img src="icons/icon48.png" alt="PhishAudit AI" class="logo">
+                <div class="header-text">
+                    <h1>PhishAudit AI</h1>
+                    <p>Real-time phishing detection</p>
+                </div>
             </div>
+            <button class="theme-toggle-btn" id="themeToggle" title="Toggle Light/Dark Theme" aria-label="Toggle theme">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
         </div>
 
         <div class="status-card" id="statusCard">
             <div class="status-indicator" id="statusIndicator"></div>
-            <div class="status-content">
-                <div class="status-label" id="statusLabel">Scanning...</div>
-                <div class="status-score" id="statusScore"></div>
+            <div class="status-info">
+                <div class="status-label" id="statusLabel">Checking URL...</div>
+                <div class="status-score" id="statusScore">Analyzing domain structure</div>
             </div>
         </div>
 
@@ -30,25 +37,23 @@
             <span class="url-text" id="urlText">—</span>
         </div>
 
-        <div class="score-section" id="scoreSection" style="display:none">
-            <span class="score-label">Risk Score</span>
+        <div class="score-section" id="scoreSection" style="display: none;">
+            <div class="score-header">
+                <span class="score-label">Risk Probability</span>
+                <span class="score-value" id="scoreValue">—</span>
+            </div>
             <div class="score-bar-container">
                 <div class="score-bar" id="scoreBar"></div>
             </div>
-            <span class="score-value" id="scoreValue"></span>
         </div>
 
         <div class="actions">
-            <button class="btn btn-trust" id="btnTrust">
-                Trust This Site
-            </button>
-            <button class="btn btn-report" id="btnReport">
-                Report False Positive
-            </button>
+            <button class="btn btn-trust" id="btnTrust">Trust Domain</button>
+            <button class="btn btn-report" id="btnReport">Report False Positive</button>
         </div>
 
         <div class="footer">
-            <span id="timestamp"></span>
+            <span id="timestamp">Waiting for navigation...</span>
         </div>
 
     </div>

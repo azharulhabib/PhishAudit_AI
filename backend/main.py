@@ -44,11 +44,7 @@ async def audit_url(
     parsed   = urlparse(url)
     hostname = parsed.hostname or ""
 
-    # ────────────────────────────────────────────────────
-    # STAGE 1 — Domain Gate
-    # Classifies domain into Tier 1, 2, or 3 based on
-    # edit distance from trusted domain list.
-    # ────────────────────────────────────────────────────
+
     gate = classify_domain(hostname)
 
     if gate["bypass"]:
@@ -67,11 +63,7 @@ async def audit_url(
             "error":          None
         }
 
-    # ────────────────────────────────────────────────────
-    # STAGE 2 — HVT Combo-Squatting Check
-    # Detects brand names embedded in wrong domains.
-    # Overrides threshold to 0.25 if detected.
-    # ────────────────────────────────────────────────────
+
     combo = detect_combo_squatting(hostname, url)
 
     if combo["detected"]:
@@ -83,11 +75,7 @@ async def audit_url(
         tier      = gate["tier"]
         source    = "ml_model"
 
-    # ────────────────────────────────────────────────────
-    # STAGE 3 — High-Risk Keyword Context Shifting
-    # Only applies to Tier 3 unknown domains.
-    # Shifts threshold downward based on keyword count.
-    # ────────────────────────────────────────────────────
+
     keyword_result = detect_high_risk_keywords(url)
 
     if tier == 3 and keyword_result["detected"]:
@@ -97,17 +85,11 @@ async def audit_url(
             threshold = 0.50
         source = "keyword_context"
 
-    # ────────────────────────────────────────────────────
-    # STAGE 4 — ML Inference
-    # Runs the Random Forest model with the threshold
-    # determined by the preceding stages.
-    # ────────────────────────────────────────────────────
+
     result = predict(url)
     status = "Phishing" if result["score"] >= threshold else "Safe"
 
-    # ────────────────────────────────────────────────────
-    # STAGE 5 — Persist to Database
-    # ────────────────────────────────────────────────────
+
     audit_log = AuditLog(
         url=url,
         result=status,

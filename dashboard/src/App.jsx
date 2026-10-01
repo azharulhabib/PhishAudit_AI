@@ -13,6 +13,27 @@ export default function App() {
     const [metrics, setMetrics] = useState(null);
     const [stats, setStats]     = useState(null);
     const [loading, setLoading] = useState(true);
+    const [theme, setTheme]     = useState(() => {
+        try {
+            return localStorage.getItem("phishAudit_theme") || "light";
+        } catch (e) {
+            return "light";
+        }
+    });
+
+    const toggleTheme = () => {
+        const nextTheme = theme === "light" ? "dark" : "light";
+        // Apply synchronously to DOM immediately to prevent any render desync or flash
+        document.documentElement.setAttribute("data-theme", nextTheme);
+        try {
+            localStorage.setItem("phishAudit_theme", nextTheme);
+        } catch (e) {}
+        setTheme(nextTheme);
+    };
+
+    useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme);
+    }, [theme]);
 
     useEffect(() => {
         fetchData();
@@ -50,7 +71,7 @@ export default function App() {
 
     return (
         <div className="dashboard">
-            <Header />
+            <Header theme={theme} onToggleTheme={toggleTheme} />
             <main className="main-content">
 
                 {/* Stats Row */}
@@ -85,15 +106,14 @@ export default function App() {
                     />
                 </div>
 
-
                 <div className="charts-row">
                     <div className="panel">
                         <div className="panel-title">
                             Model Performance Metrics
                         </div>
                         {loading
-                            ? <div className="loading">Loading...</div>
-                            : <MetricsChart metrics={metrics} />
+                            ? <div className="loading">Loading metrics...</div>
+                            : <MetricsChart metrics={metrics} theme={theme} />
                         }
                     </div>
 
@@ -104,12 +124,12 @@ export default function App() {
                         <div style={{
                             display: "flex",
                             flexDirection: "column",
-                            gap: "12px",
-                            marginTop: "8px"
+                            gap: "16px",
+                            marginTop: "12px"
                         }}>
                             {[
                                 {
-                                    label: "Phishing Rate",
+                                    label: "Phishing Detection Rate",
                                     value: stats?.total
                                         ? Math.round(
                                             (stats.phishing / stats.total) * 100
@@ -118,7 +138,7 @@ export default function App() {
                                     color: "var(--accent-red)"
                                 },
                                 {
-                                    label: "Safe Rate",
+                                    label: "Safe URLs Rate",
                                     value: stats?.total
                                         ? Math.round(
                                             (stats.safe / stats.total) * 100
@@ -133,22 +153,23 @@ export default function App() {
                                         justifyContent: "space-between",
                                         marginBottom: "6px",
                                         fontSize: "12px",
+                                        fontWeight: "500",
                                         color: "var(--text-secondary)"
                                     }}>
                                         <span>{item.label}</span>
-                                        <span>{item.value}%</span>
+                                        <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>{item.value}%</span>
                                     </div>
                                     <div style={{
-                                        height: "6px",
+                                        height: "7px",
                                         background: "var(--border)",
-                                        borderRadius: "3px",
+                                        borderRadius: "4px",
                                         overflow: "hidden"
                                     }}>
                                         <div style={{
                                             width: `${item.value}%`,
                                             height: "100%",
                                             background: item.color,
-                                            borderRadius: "3px",
+                                            borderRadius: "4px",
                                             transition: "width 0.5s ease"
                                         }} />
                                     </div>
@@ -160,11 +181,15 @@ export default function App() {
 
                 <div className="panel">
                     <div className="panel-title">
-                        Recent Audit Logs
+                        Recent URL Audit Logs
                     </div>
                     {loading
-                        ? <div className="loading">Loading...</div>
-                        : <AuditTable logs={logs.slice(0, 50)} />
+                        ? <div className="loading">Loading audit records...</div>
+                        : (
+                            <div className="audit-table-wrapper">
+                                <AuditTable logs={logs.slice(0, 50)} />
+                            </div>
+                        )
                     }
                 </div>
 
