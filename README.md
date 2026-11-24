@@ -21,8 +21,8 @@ PhishAudit AI bridges this critical defense gap. Embedded within Chromium via a 
   * Stage 4 (Tier 3 Keyword Context Shifting): Unknown domains adjust thresholds dynamically (tau = 0.35 for 3 or more credential tokens; tau = 0.50 for 1 to 2 tokens; tau = 0.75 baseline).
   * Stage 5: Baseline Random Forest inference (tau = 0.6205 cost-sensitive optimum).
 * Bangladesh Financial Sector Protection: Explicit threat models for regional Mobile Financial Services (MFS) and banks frequently targeted by SMS phishing: bKash, Nagad, DBBL Rocket, BRAC Bank, City Bank, EBL, UCBL, and Islami Bank.
-* Real-Time Extension UX: Instant badge indicators (green for safe, red for phishing) and browser alert notifications.
-* Fail-Safe Offline Design: If the backend service is offline, browsing continues uninterrupted with an Unknown status; the tool never blocks or crashes navigation.
+* Real-Time Extension UX: Instant badge indicators (red "!" for phishing, grey "?" when no verdict is available) and browser alert notifications.
+* Fail-Safe Offline Design: If the backend service is offline, browsing continues uninterrupted with an Unknown status; the tool never blocks or crashes navigation. Prediction failures also give Unknown, not Safe.
 * Security Operations Dashboard: Dedicated React 19 and Recharts administrative console providing live audit streams, risk distributions, and model performance metrics.
 
 ---
@@ -48,7 +48,7 @@ PhishAudit AI bridges this critical defense gap. Embedded within Chromium via a 
 |  ---------------------------  |                       |  ----------------------------  |
 |  Stage 1: Trusted Bypass      |                       |  SQLAlchemy ORM                |
 |  Stage 2: Levenshtein Gate    |                       |  PostgreSQL (Prod)             |
-|  Stage 3: Combo-Squatting HVT |                       |  SQLite Fallback (Dev/Demo)    |
+|  Stage 3: Combo-Squatting HVT |                       |  (no SQLite fallback)          |
 |  Stage 4: Keyword Shifting    |                       |  Audit Logs & Model Metrics    |
 |  Stage 5: Random Forest (37F) |                       +--------------------------------+
 +---------------+---------------+
@@ -79,6 +79,8 @@ All features are extracted in under 2ms directly from the raw URL string, preser
 
 Evaluated across 521,065 cleaned binary URLs (82.17% benign, 17.83% phishing) from the Malicious URL Detection Dataset (Enhanced 2026), and externally stress-tested on the PhiUSIIL dataset (235,795 URLs):
 
+> **Historical results (P2).** The numbers below were reported in P2. The 0.6205 threshold was selected using test labels, and the model was trained on features stored in a CSV file. They are kept for the record, not as a clean held-out evaluation. Re-evaluation under a stricter protocol is part of P3.
+
 ### 1. Primary Model Baseline (Test Set: 104,213 URLs)
 * Optimal Decision Threshold (tau): 0.6205 (calibrated via Precision-Recall curve optimization)
 * Accuracy: 93.10%
@@ -99,6 +101,8 @@ Evaluated across 521,065 cleaned binary URLs (82.17% benign, 17.83% phishing) fr
 * False Negatives (FN): 2,877
 
 ### 4. External Cross-Dataset Generalization (PhiUSIIL Benchmark)
+> **Predates the label-mapping fix.** This section was written before commit `ef95e93` corrected the PhiUSIIL label mapping, so its figures should be treated as superseded and unverified.
+
 Evaluating the standalone Random Forest on 235,795 unseen URLs from PhiUSIIL demonstrated a 24.96% drop in ROC-AUC (from 96.26% to 71.30%). The baseline model achieved 100% recall but experienced a precision drop to 58.0% due to class prior shift (57:43 distribution vs. 82% benign in training). 
 
 Key Finding: Fixed classification thresholds do not generalize across varying real-world distributions. This empirical finding provides the core academic justification for PhishAudit AI's dynamic cascading pipeline.
@@ -114,7 +118,6 @@ PhishAudit_AI/
 |   |-- cross_dataset_eval.py    # PhiUSIIL external dataset generalization benchmark
 |   |-- data/                    # Datasets (Primary Kaggle 2026 & PhiUSIIL)
 |   |-- data_audit.py            # Dataset integrity & domain overlap audit
-|   |-- data_preprocessing.py    # Data cleaning & normalization pipeline
 |   |-- database/
 |   |   `-- models.py            # ORM schemas (AuditLog, ModelMetrics, User, Whitelist)
 |   |-- domain_gate.py           # Stage 1 (Bypass) & Stage 2 (Levenshtein typosquatting)
@@ -124,7 +127,8 @@ PhishAudit_AI/
 |   |-- ml_engine.py             # Inference runner & feature vectorizer
 |   |-- models/                  # Serialized artifacts (rf_model.pkl, optimal_threshold.pkl)
 |   |-- requirements.txt         # Python dependencies
-|   |-- run_api.py               # API launcher with SQLite failover & initial data seeder
+|   |-- requirements-dev.txt     # Test dependencies (pytest, httpx)
+|   |-- tests/                   # Backend tests (in-memory SQLite, stubbed model)
 |   |-- save_metrics.py          # Metric calculation & persistence script
 |   |-- train_model.py           # Random Forest training & threshold optimizer
 |   `-- trusted_domains.py       # Curated 100+ reputation whitelist
@@ -157,6 +161,8 @@ PhishAudit_AI/
 
 ### Step 1: Start the Backend API
 
+The backend needs a database reachable through `DATABASE_URL` (PostgreSQL is what the project was run against). `connection.py` raises an error if `DATABASE_URL` is not set; there is no SQLite fallback in the application code.
+
 ```bash
 cd backend
 
@@ -166,12 +172,29 @@ source venv/bin/activate        # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+# The code also imports pandas, numpy and scikit-learn, which
+# requirements.txt does not list yet; install them too.
 
-# Run the API server (Includes auto SQLite fallback and initial metric seeding)
-python run_api.py
+# Create backend/.env containing your database connection string
+#   DATABASE_URL=postgresql://<user>:<password>@localhost:5432/<database>
+
+# Model files (models/rf_model.pkl, feature_columns.pkl,
+# optimal_threshold.pkl) are not in Git. Create them with train_model.py
+# (needs the dataset in backend/data/), or place them there yourself.
+
+# Run the API server from inside backend/ (imports and model paths are relative)
+uvicorn main:app --port 8000
 ```
 * API Server: http://127.0.0.1:8000
 * Interactive Swagger Documentation: http://127.0.0.1:8000/docs
+
+Run the tests (no database or model files needed):
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+python -m pytest
+```
 
 ---
 
@@ -203,7 +226,7 @@ npm run dev
 ## API Reference
 
 ### `POST /audit`
-Evaluates a target URL through the 5-stage cascading pipeline.
+Evaluates a target URL through the 5-stage cascading pipeline. If the model prediction fails, the response has `status: "Unknown"`, `recommendation: "unavailable"`, `score: null` and an `error` message; it is never reported as Safe, and it is not written to the audit log.
 
 Request Payload:
 ```json
@@ -231,10 +254,22 @@ Response Payload:
 ```
 
 ### `GET /metrics`
-Retrieves the latest verified model evaluation metrics for the admin console.
+Returns the latest stored model metrics for the admin console. `accuracy` is always `null` (the table has no accuracy column). The response includes a `caveat` field: the stored metrics were computed on the full dataset including training rows, so they are not held-out results.
 
 ### `GET /logs`
 Retrieves the 100 most recent URL audit events recorded in the database.
+
+---
+
+## Known Limitations
+
+* Reported P2 metrics and the 0.6205 threshold are historical (see Empirical Evaluation); the threshold was chosen on test labels.
+* Metrics stored in the database come from `save_metrics.py`, which evaluates on the full dataset including training rows. They are not held-out results.
+* The cross-dataset (PhiUSIIL) numbers predate the label-mapping fix.
+* `requirements.txt` does not list pandas, numpy or scikit-learn.
+* The database is PostgreSQL via `DATABASE_URL`; there is no SQLite fallback.
+* Failed predictions are returned as Unknown but are not stored in the audit log (the schema has no Unknown handling).
+* The extension has not been covered by automated tests.
 
 ---
 
