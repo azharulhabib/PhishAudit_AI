@@ -96,8 +96,14 @@ chrome.webNavigation.onCommitted.addListener((details) => {
                     status: "Unknown",
                     score: null,
                     recommendation: "unavailable",
+                    error: "Backend unavailable.",
                     timestamp: new Date().toISOString()
                 }
+            });
+            chrome.action.setBadgeText({ text: "?", tabId: details.tabId });
+            chrome.action.setBadgeBackgroundColor({
+                color: "#718096",
+                tabId: details.tabId
             });
         });
     }
