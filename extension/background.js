@@ -79,6 +79,7 @@ chrome.webNavigation.onCommitted.addListener((details) => {
             if (data.status === "Phishing") {
                 chrome.notifications.create({
                     type: "basic",
+                    iconUrl: chrome.runtime.getURL("icons/icon48.png"),
                     title: "PhishAudit Warning",
                     message: `Suspicious URL detected.\nRisk Score: ${(data.score * 100).toFixed(0)}%`
                 });
