@@ -165,6 +165,15 @@ def get_logs(db: Session = Depends(get_db)):
     }
 
 
+# save_metrics.py evaluates the saved model on the full dataset (all rows,
+# including the rows the model was trained on), so the stored values are
+# in-sample and are not held-out results.
+METRICS_CAVEAT = (
+    "Stored metrics were computed on the full dataset including training "
+    "rows; they are not held-out results."
+)
+
+
 @app.get("/metrics")
 def get_metrics(db: Session = Depends(get_db)):
     latest = db.query(ModelMetrics).order_by(
@@ -186,10 +195,13 @@ def get_metrics(db: Session = Depends(get_db)):
     return {
         "available":     True,
         "model_version": latest.model_version,
-        "accuracy":      latest.precision,
+        # model_metrics has no accuracy column (M1 adds none), so accuracy is
+        # reported as null rather than mislabelling precision as accuracy.
+        "accuracy":      None,
         "precision":     latest.precision,
         "recall":        latest.recall,
         "f1_score":      latest.f1_score,
         "roc_auc":       latest.roc_auc,
-        "source":        "database"
+        "source":        "database",
+        "caveat":        METRICS_CAVEAT
     }

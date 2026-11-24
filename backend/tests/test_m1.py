@@ -1,5 +1,5 @@
 import main
-from database.models import AuditLog
+from database.models import AuditLog, ModelMetrics
 
 # Unknown domain, no combo-squatting/keywords expected -> tier 3, threshold 0.75.
 PLAIN_URL = "http://zz-unlisted-example-host.test/page"
@@ -79,3 +79,23 @@ def test_normal_path_safe_below_threshold(client, monkeypatch):
     assert body["score"] < body["threshold_used"]
     assert body["status"] == "Safe"
     assert body["recommendation"] == "allow"
+
+
+def test_metrics_accuracy_is_null_not_precision_and_has_caveat(
+    client, session_factory
+):
+    db = session_factory()
+    db.add(ModelMetrics(
+        model_version="test", precision=0.9, recall=0.8,
+        f1_score=0.85, roc_auc=0.96, urls_audited=10,
+    ))
+    db.commit()
+    db.close()
+
+    body = client.get("/metrics").json()
+    assert body["available"] is True
+    assert body["precision"] == 0.9
+    assert body["accuracy"] is None
+    assert body["accuracy"] != body["precision"]
+    assert "not held-out" in body["caveat"]
+    assert "training" in body["caveat"]

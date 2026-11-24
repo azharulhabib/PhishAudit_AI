@@ -24,6 +24,9 @@ TRAINING_FEATURES = [
 ]
 
 
+# NOTE: the evaluation below runs on the FULL dataset, including the rows the
+# model was trained on. The stored values are in-sample, not held-out results.
+# Computation is intentionally left unchanged (M1 scope); /metrics labels them.
 def evaluate_and_save(model_version: str = "rf_v1.0"):
     print("Loading dataset for evaluation...")
     df = pd.read_csv("data/dataset_with_all_features v2.csv")
