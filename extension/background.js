@@ -16,9 +16,45 @@ chrome.webNavigation.onCommitted.addListener((details) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url: targetUrl })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                // Non-OK HTTP response: no verdict. Treat as Unknown.
+                return {
+                    url: targetUrl,
+                    status: "Unknown",
+                    score: null,
+                    recommendation: "unavailable",
+                    error: `Audit failed (HTTP ${response.status}).`
+                };
+            }
+            return response.json();
+        })
         .then(data => {
             console.log("[PhishAudit] Audit result:", data);
+
+            // Fail closed: only an explicit Safe or Phishing verdict is
+            // shown as such. Anything else (Unknown, missing, unexpected)
+            // gets a grey "?" badge and never a safe/green state.
+            if (data.status !== "Safe" && data.status !== "Phishing") {
+                chrome.storage.local.set({
+                    lastAudit: {
+                        url: data.url || targetUrl,
+                        status: "Unknown",
+                        score: null,
+                        recommendation: "unavailable",
+                        error: data.error || "No verdict available.",
+                        timestamp: new Date().toISOString()
+                    }
+                });
+                chrome.action.setBadgeText({ text: "?", tabId: details.tabId });
+                chrome.action.setBadgeBackgroundColor({
+                    color: "#718096",
+                    tabId: details.tabId
+                });
+                console.warn("[PhishAudit] No verdict (Unknown):", data.error);
+                return;
+            }
+
             chrome.storage.local.set({
                 lastAudit: {
                     url: data.url,

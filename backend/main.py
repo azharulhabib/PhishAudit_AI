@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -10,6 +12,8 @@ from ml_engine import predict
 from domain_gate import classify_domain
 from hvt_domains import detect_combo_squatting, detect_high_risk_keywords
 
+
+logger = logging.getLogger("phishaudit")
 
 Base.metadata.create_all(bind=engine)
 
@@ -86,7 +90,32 @@ async def audit_url(
         source = "keyword_context"
 
 
-    result = predict(url)
+    try:
+        result = predict(url)
+    except Exception:
+        result = {"status": "Error", "score": None, "error": "Prediction failed."}
+
+    # Fail closed: a failed prediction must never be reported as Safe/allow.
+    # It is not written to audit_logs (no Unknown handling without a schema
+    # migration); the failure is logged server-side without the URL, which
+    # can contain credentials or tokens.
+    if result.get("error") or result.get("status") == "Error":
+        logger.error("Prediction failed; returning Unknown (not persisted).")
+        return {
+            "url":            url,
+            "status":         "Unknown",
+            "score":          None,
+            "db_id":          None,
+            "recommendation": "unavailable",
+            "tier":           tier,
+            "threshold_used": threshold,
+            "source":         source,
+            "combo_brand":    combo.get("brand"),
+            "keywords_found": keyword_result.get("keywords_found"),
+            "closest_match":  gate.get("closest_match"),
+            "error":          result.get("error") or "Prediction failed."
+        }
+
     status = "Phishing" if result["score"] >= threshold else "Safe"
 
 

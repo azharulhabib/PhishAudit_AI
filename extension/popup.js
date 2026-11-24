@@ -96,7 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 statusCard.classList.add("unknown");
                 statusLabel.textContent = "Unknown";
-                statusScore.textContent = "Backend unavailable.";
+                statusScore.textContent = audit.error
+                    ? "No verdict available. Do not assume this site is safe."
+                    : "Backend unavailable.";
             }
 
             if (audit.score !== null && audit.score !== undefined) {
