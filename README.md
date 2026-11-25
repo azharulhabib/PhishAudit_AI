@@ -18,8 +18,9 @@ PhishAudit AI bridges this critical defense gap. Embedded within Chromium via a 
   * Stage 1 (Tier 1 Bypass): Sub-millisecond pass-through for 100+ verified high-reputation domains.
   * Stage 2 (Tier 2 Typosquatting Gate): Levenshtein edit distance (1 to 2) against trusted roots enforces an aggressive detection threshold (tau = 0.30).
   * Stage 3 (Tier 4 Combo-Squatting / HVT Gate): High-Value Target (HVT) brand matching across 40+ institutions lowers the threshold to tau = 0.25.
-  * Stage 4 (Tier 3 Keyword Context Shifting): Unknown domains adjust thresholds dynamically (tau = 0.35 for 3 or more credential tokens; tau = 0.50 for 1 to 2 tokens; tau = 0.75 baseline).
-  * Stage 5: Baseline Random Forest inference (tau = 0.6205 cost-sensitive optimum).
+  * Stage 4 (Tier 3 Keyword Context Shifting): Unknown domains adjust thresholds dynamically (tau = 0.35 for 3 or more credential tokens; tau = 0.50 for 1 to 2 tokens; otherwise the serving cutoff 0.7411850967153485 applies).
+  * Stage 5: Random Forest inference with the scheme-blind retrain at the serving cutoff 0.7411850967153485 (see "Served Model and Serving Cutoff").
+  * The thresholds of Stages 2 to 4 (0.30, 0.25, 0.35, 0.50) were set for the previous model and have not been validated with the model now served.
 * Bangladesh Financial Sector Protection: Explicit threat models for regional Mobile Financial Services (MFS) and banks frequently targeted by SMS phishing: bKash, Nagad, DBBL Rocket, BRAC Bank, City Bank, EBL, UCBL, and Islami Bank.
 * Real-Time Extension UX: Instant badge indicators (red "!" for phishing, grey "?" when no verdict is available) and browser alert notifications.
 * Fail-Safe Offline Design: If the backend service is offline, browsing continues uninterrupted with an Unknown status; the tool never blocks or crashes navigation. Prediction failures also give Unknown, not Safe.
@@ -79,7 +80,7 @@ All features are extracted in under 2ms directly from the raw URL string, preser
 
 Evaluated across 521,065 cleaned binary URLs (82.17% benign, 17.83% phishing) from the Malicious URL Detection Dataset (Enhanced 2026), and externally stress-tested on the PhiUSIIL dataset (235,795 URLs):
 
-> **Historical results (P2).** The numbers below were reported in P2. The 0.6205 threshold was selected using test labels, and the model was trained on features stored in a CSV file. They are kept for the record, not as a clean held-out evaluation. Re-evaluation under a stricter protocol is part of P3.
+> **Historical results (P2).** The numbers below were reported in P2. The 0.6205 threshold was selected using test labels, and the model was trained on features stored in a CSV file. They are kept for the record, not as a clean held-out evaluation. Re-evaluation under a stricter protocol is part of P3. They describe the previous model, which the service no longer uses; see "Served Model and Serving Cutoff" for the model now served.
 
 ### 1. Primary Model Baseline (Test Set: 104,213 URLs)
 * Optimal Decision Threshold (tau): 0.6205 (calibrated via Precision-Recall curve optimization)
@@ -109,29 +110,49 @@ Key Finding: Fixed classification thresholds do not generalize across varying re
 
 ---
 
+## Served Model and Serving Cutoff
+
+* Model: a 100-tree Random Forest (`max_depth` 20, balanced class weights, `random_state` 42) trained on URLs normalized with N(u). The file is `backend/models/scheme_blind_rf_v1.joblib`, SHA256 `14b852f7390467fd34b447aa4eab77171a26018dbae5b686e514bc7c33a024c8`. It is not in Git; place it there yourself or point `PHISHAUDIT_MODEL_PATH` (and `PHISHAUDIT_MODEL_SHA256`) at it.
+* Normalization N(u): remove a leading `http://` or `https://` (case-insensitive), then a leading `www.`. Nothing else changes. Strings with another scheme or a leading `//` are left unchanged. Every URL is normalized before feature extraction, so `https://www.example.com/a` and `example.com/a` give the same score. The cascade's other stages still see the original URL.
+* Features: the 37 features of URL-feature contract 1.0.0, computed by an unmodified, vendored copy of the research extractor in `backend/vendor/url-features-v1/` (every file is listed with its SHA256 in `VENDOR_MANIFEST.json` and checked by a test). Any extractor error, such as userinfo (`user@host`), an unsupported scheme or an invalid host, gives Unknown, never Safe.
+* Serving cutoff: `0.7411850967153485` in `backend/serving_config.py`, the single source of truth. A model score greater than or equal to it is a phishing decision at the model stage (Stage 4 default and Stage 5). It is the smallest observed validation score that keeps benign false positives at or under 1% (607 of 60,725). On the research validation split (group-disjoint from training; 75,606 rows) it catches 8,576 of 14,881 phishing URLs (recall 57.6%) with ROC-AUC 0.903 and average precision 0.805.
+* What that does not show: the cutoff was chosen and evaluated on the same validation rows, so it is a validation estimate, not a guarantee, and no held-out test result is claimed. The research plan's own criterion for this model (at least 10,403 true positives at the 1% budget) was not met; the model is served by the project owner's decision, because the previous model's validation figures do not describe browser-form URLs (forcing `https://` onto validation URLs raised its benign false positives from 1.0% to 83.4% at its cutoff). The cutoff has not been tested on browser traffic.
+* Decisions use the unrounded score. The `score` returned to clients and stored in the audit log is rounded to 4 decimals for display.
+* Fail closed: if the model file is missing, its SHA256 differs from the expected value, the file cannot be loaded, its class order or feature count is wrong, a library version differs from the one it was saved with, or the extractor cannot start, nothing is scored and audits that reach the model return Unknown with an error message. Startup logs either "Model verified and loaded" or "MODEL UNAVAILABLE (...)". The trusted-domain bypass does not use the model and still returns Safe.
+* Not validated with this model: the trusted-domain bypass, the typosquatting, combo-squatting and keyword stages and their constants. They were left as they were. In the milestone smoke check (63 hand-written legitimate sites, results in the research evidence directory), 4 were flagged, all by these lower-threshold stages; the model stage alone flagged none of the 14 sites that reached it.
+
+---
+
 ## Repository Directory Structure
 
 ```text
 PhishAudit_AI/
 |-- backend/
+|   |-- benchmarks/
+|   |   `-- latency.py           # In-process latency and memory benchmark of /audit
 |   |-- connection.py            # Database engine & session generator (SQLAlchemy)
-|   |-- cross_dataset_eval.py    # PhiUSIIL external dataset generalization benchmark
-|   |-- data/                    # Datasets (Primary Kaggle 2026 & PhiUSIIL)
-|   |-- data_audit.py            # Dataset integrity & domain overlap audit
+|   |-- cross_dataset_eval.py    # LEGACY (unused by the service): PhiUSIIL benchmark of the old model
+|   |-- data/                    # Datasets (Primary Kaggle 2026 & PhiUSIIL; not in Git)
+|   |-- data_audit.py            # LEGACY (unused by the service): dataset integrity & domain overlap audit
 |   |-- database/
 |   |   `-- models.py            # ORM schemas (AuditLog, ModelMetrics, User, Whitelist)
 |   |-- domain_gate.py           # Stage 1 (Bypass) & Stage 2 (Levenshtein typosquatting)
-|   |-- feature_extractor.py     # 37-feature extraction & normalization engine
+|   |-- feature_extractor.py     # LEGACY (unused by the service): old 37-feature extractor
 |   |-- hvt_domains.py           # Stage 3 (Combo-squatting) & Stage 4 (Keyword shifting)
 |   |-- main.py                  # FastAPI application & master pipeline orchestrator
-|   |-- ml_engine.py             # Inference runner & feature vectorizer
-|   |-- models/                  # Serialized artifacts (rf_model.pkl, optimal_threshold.pkl)
-|   |-- requirements.txt         # Python dependencies
+|   |-- ml_engine.py             # Hash-checked model loading and scoring (N(u) -> features -> score)
+|   |-- models/                  # scheme_blind_rf_v1.joblib (served, not in Git); legacy rf_model.pkl, feature_columns.pkl, optimal_threshold.pkl are unused
+|   |-- normalization.py         # N(u) scheme-blind URL normalizer
+|   |-- requirements.txt         # Pinned Python dependencies (Python 3.11)
 |   |-- requirements-dev.txt     # Test dependencies (pytest, httpx)
-|   |-- tests/                   # Backend tests (in-memory SQLite, stubbed model)
-|   |-- save_metrics.py          # Metric calculation & persistence script
-|   |-- train_model.py           # Random Forest training & threshold optimizer
-|   `-- trusted_domains.py       # Curated 100+ reputation whitelist
+|   |-- sanity/                  # Hand-written URL lists and a smoke-check runner
+|   |-- serving_config.py        # Served model path, expected SHA256 and the serving cutoff
+|   |-- tests/                   # Backend tests (in-memory SQLite, stub model files)
+|   |-- save_metrics.py          # LEGACY (unused by the service): metrics of the old model
+|   |-- train_model.py           # LEGACY (unused by the service): old training script
+|   |-- trusted_domains.py       # Curated 100+ reputation whitelist
+|   |-- url_features.py          # Contract 1.0.0 feature extraction through the vendored extractor
+|   `-- vendor/url-features-v1/  # Byte-identical frozen extractor, contract files and VENDOR_MANIFEST.json
 |-- dashboard/
 |   |-- src/
 |   |   |-- components/          # React components (AuditTable, MetricsChart, StatsCard, Header)
@@ -153,7 +174,7 @@ PhishAudit_AI/
 ## Installation and Setup
 
 ### Prerequisites
-* Python 3.10+ (Python 3.11 recommended)
+* Python 3.11 (the pinned dependencies and the feature extractor, which checks exact library versions at startup, were validated on 3.11.8)
 * Node.js 18+ and npm
 * Google Chrome or any Chromium-based browser
 
@@ -170,31 +191,35 @@ cd backend
 python3 -m venv venv
 source venv/bin/activate        # On Windows: venv\Scripts\activate
 
-# Install dependencies
+# Install the pinned dependencies (exact versions; the extractor and the
+# model require them, and the service refuses to score otherwise)
 pip install -r requirements.txt
-# The code also imports pandas, numpy and scikit-learn, which
-# requirements.txt does not list yet; install them too.
 
 # Create backend/.env containing your database connection string
 #   DATABASE_URL=postgresql://<user>:<password>@localhost:5432/<database>
 
-# Model files (models/rf_model.pkl, feature_columns.pkl,
-# optimal_threshold.pkl) are not in Git. Create them with train_model.py
-# (needs the dataset in backend/data/), or place them there yourself.
+# Place the served model at models/scheme_blind_rf_v1.joblib (it is not in Git).
+# Its SHA256 must be 14b852f7390467fd34b447aa4eab77171a26018dbae5b686e514bc7c33a024c8.
+# To keep it elsewhere, set PHISHAUDIT_MODEL_PATH (and PHISHAUDIT_MODEL_SHA256 if
+# the file is a different, separately approved model).
 
-# Run the API server from inside backend/ (imports and model paths are relative)
+# Run the API server from inside backend/
 uvicorn main:app --port 8000
 ```
+* On startup the log shows either `Model verified and loaded` or `MODEL UNAVAILABLE (reason)`. Without a verified model every audit that reaches the model returns Unknown.
+* `GET /` reports whether the model loaded, its SHA256, the serving cutoff and the extractor contract version.
 * API Server: http://127.0.0.1:8000
 * Interactive Swagger Documentation: http://127.0.0.1:8000/docs
 
-Run the tests (no database or model files needed):
+Run the tests (no database, server or model file needed; tests that need the real model file or the research workspace are skipped when it is absent):
 
 ```bash
 cd backend
 pip install -r requirements-dev.txt
 python -m pytest
 ```
+
+The legacy scripts (`train_model.py`, `save_metrics.py`, `cross_dataset_eval.py`, `data_audit.py`) are not used by the service and need pandas, which `requirements.txt` does not install.
 
 ---
 
@@ -225,8 +250,11 @@ npm run dev
 
 ## API Reference
 
+### `GET /`
+Returns `status` and `service`, plus a `model` object: `model_loaded`, `model_version`, `model_sha256` (of the verified file, otherwise `null`), `model_error`, `model_load_seconds`, `serving_cutoff`, `normalizer`, `extractor_contract_version` and `extractor_bundle_sha256`.
+
 ### `POST /audit`
-Evaluates a target URL through the 5-stage cascading pipeline. If the model prediction fails, the response has `status: "Unknown"`, `recommendation: "unavailable"`, `score: null` and an `error` message; it is never reported as Safe, and it is not written to the audit log.
+Evaluates a target URL through the 5-stage cascading pipeline. If the model is unavailable, the extractor rejects the URL, or the prediction fails, the response has `status: "Unknown"`, `recommendation: "unavailable"`, `score: null` and an `error` message; it is never reported as Safe, and it is not written to the audit log. The returned and stored `score` is rounded to 4 decimals for display; the Phishing/Safe decision uses the unrounded score.
 
 Request Payload:
 ```json
@@ -266,9 +294,13 @@ Retrieves the 100 most recent URL audit events recorded in the database.
 * Reported P2 metrics and the 0.6205 threshold are historical (see Empirical Evaluation); the threshold was chosen on test labels.
 * Metrics stored in the database come from `save_metrics.py`, which evaluates on the full dataset including training rows. They are not held-out results.
 * The cross-dataset (PhiUSIIL) numbers predate the label-mapping fix.
-* `requirements.txt` does not list pandas, numpy or scikit-learn.
+* The serving cutoff (0.7411850967153485) comes from validation scores only. It has not been checked on held-out test data or on browser traffic, and the research plan's own pass criterion for the served model was not met (see "Served Model and Serving Cutoff").
+* The trusted-domain bypass and the typosquatting, combo-squatting and keyword stages, with their thresholds (0.30, 0.25, 0.35, 0.50), are not validated with the served model. In a 63-site smoke check they produced all 4 false alarms; that check is not a performance estimate.
+* The model and the metrics shown by `/metrics` do not match: stored metrics come from `save_metrics.py` for the previous model.
+* The extension also sends non-http(s) URLs such as `file:` or `data:`; those return Unknown.
+* The legacy training and evaluation scripts, `feature_extractor.py` and the old files in `models/` are unused by the service and were not run or updated for the new model.
 * The database is PostgreSQL via `DATABASE_URL`; there is no SQLite fallback.
-* Failed predictions are returned as Unknown but are not stored in the audit log (the schema has no Unknown handling).
+* Unknown results (model unavailable, extractor error or prediction failure) are returned to the client but are not stored in the audit log (the schema has no Unknown handling).
 * The extension has not been covered by automated tests.
 
 ---
