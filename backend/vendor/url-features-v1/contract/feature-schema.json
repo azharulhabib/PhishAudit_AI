@@ -1,0 +1,677 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:phishaudit:url-features:1.0.0",
+  "title": "URL feature result 1.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "bundle_sha256",
+    "status",
+    "error_code",
+    "features",
+    "metadata"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "1.0.0"
+    },
+    "bundle_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "invalid",
+        "unsupported",
+        "internal_error"
+      ]
+    },
+    "error_code": {
+      "enum": [
+        null,
+        "INPUT_TYPE",
+        "EMPTY_INPUT",
+        "INPUT_TOO_LONG",
+        "INVALID_CODEPOINT",
+        "FORBIDDEN_CHARACTER",
+        "UNSUPPORTED_SCHEME",
+        "EMPTY_AUTHORITY",
+        "USERINFO_UNSUPPORTED",
+        "INVALID_AUTHORITY",
+        "INVALID_PORT",
+        "HOST_PERCENT_UNSUPPORTED",
+        "IP_UNSUPPORTED",
+        "INVALID_IP",
+        "INVALID_HOST",
+        "INVALID_PERCENT_ESCAPE",
+        "INVALID_UTF8_ESCAPE",
+        "INTERNAL_CONTRACT_ERROR"
+      ]
+    },
+    "features": {
+      "oneOf": [
+        {
+          "type": "array",
+          "prefixItems": [
+            {
+              "title": "raw_length",
+              "description": "Legacy slot 1: url_len",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65536
+            },
+            {
+              "title": "raw_at_count",
+              "description": "Legacy slot 2: @",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_question_count",
+              "description": "Legacy slot 3: ?",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_hyphen_count",
+              "description": "Legacy slot 4: -",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_equals_count",
+              "description": "Legacy slot 5: =",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_dot_count",
+              "description": "Legacy slot 6: .",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_hash_count",
+              "description": "Legacy slot 7: #",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_percent_count",
+              "description": "Legacy slot 8: %",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_plus_count",
+              "description": "Legacy slot 9: +",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_dollar_count",
+              "description": "Legacy slot 10: $",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_exclamation_count",
+              "description": "Legacy slot 11: !",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_asterisk_count",
+              "description": "Legacy slot 12: *",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_comma_count",
+              "description": "Legacy slot 13: ,",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_double_slash_count",
+              "description": "Legacy slot 14: //",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_ascii_digit_count",
+              "description": "Legacy slot 15: digits",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_ascii_letter_count",
+              "description": "Legacy slot 16: letters",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "explicit_https",
+              "description": "Legacy slot 17: https",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "host_is_ip",
+              "description": "Legacy slot 18: having_ip_address",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "host_recovered",
+              "description": "Legacy slot 19: abnormal_url",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "shortener_exact_host",
+              "description": "Legacy slot 20: Shortining_Service",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "brand_token_present",
+              "description": "Legacy slot 21: phish_has_brand",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "brand_token_in_subdomain",
+              "description": "Legacy slot 22: phish_brand_in_subdomain",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "brand_token_in_path",
+              "description": "Legacy slot 23: phish_brand_in_path",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "host_hyphen_count",
+              "description": "Legacy slot 24: phish_hyphen_count",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "host_ascii_digit_count",
+              "description": "Legacy slot 25: phish_digit_count",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "host_length_gt20",
+              "description": "Legacy slot 26: phish_long_domain",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "subdomains_gt2",
+              "description": "Legacy slot 27: phish_many_subdomains",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "listed_final_label",
+              "description": "Legacy slot 28: phish_suspicious_tld",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "keyword_distinct_count",
+              "description": "Legacy slot 29: phish_keyword_count",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            {
+              "title": "nested_http_text",
+              "description": "Legacy slot 30: phish_has_redirect",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "query_pair_count",
+              "description": "Legacy slot 31: phish_param_count",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_percent_triplet_count",
+              "description": "Legacy slot 32: phish_encoded_chars",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "host_character_entropy",
+              "description": "Legacy slot 33: adv_domain_ngram_entropy",
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "title": "raw_path_character_entropy",
+              "description": "Legacy slot 34: adv_path_entropy",
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "title": "raw_ascii_digit_ratio",
+              "description": "Legacy slot 35: adv_digit_ratio",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "title": "subdomain_label_count",
+              "description": "Legacy slot 36: adv_subdomain_count",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            },
+            {
+              "title": "raw_ascii_token_count",
+              "description": "Legacy slot 37: adv_token_count",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9223372036854775807
+            }
+          ],
+          "items": false,
+          "minItems": 37,
+          "maxItems": 37
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_scheme",
+        "scheme_form",
+        "host_recovered",
+        "host_kind",
+        "host",
+        "port",
+        "public_suffix",
+        "registrable_domain",
+        "suffix_rule",
+        "suffix_section",
+        "query_present",
+        "fragment_present"
+      ],
+      "properties": {
+        "source_scheme": {
+          "enum": [
+            "http",
+            "https",
+            null
+          ]
+        },
+        "scheme_form": {
+          "enum": [
+            "explicit",
+            "network_path",
+            "absent",
+            null
+          ]
+        },
+        "host_recovered": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "host_kind": {
+          "enum": [
+            "dns",
+            "ipv4",
+            "ipv6",
+            null
+          ]
+        },
+        "host": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "public_suffix": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "registrable_domain": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "suffix_rule": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "suffix_section": {
+          "enum": [
+            "ICANN",
+            "PRIVATE",
+            "DEFAULT",
+            null
+          ]
+        },
+        "query_present": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "fragment_present": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "ok"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error_code": {
+            "type": "null"
+          },
+          "features": {
+            "type": "array"
+          },
+          "metadata": {
+            "properties": {
+              "scheme_form": {
+                "enum": [
+                  "explicit",
+                  "network_path",
+                  "absent"
+                ]
+              },
+              "host_recovered": {
+                "type": "boolean"
+              },
+              "host_kind": {
+                "enum": [
+                  "dns",
+                  "ipv4",
+                  "ipv6"
+                ]
+              },
+              "host": {
+                "type": "string",
+                "minLength": 1
+              },
+              "query_present": {
+                "type": "boolean"
+              },
+              "fragment_present": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "error_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "features": {
+            "type": "null"
+          },
+          "metadata": {
+            "properties": {
+              "source_scheme": {
+                "type": "null"
+              },
+              "scheme_form": {
+                "type": "null"
+              },
+              "host_recovered": {
+                "type": "null"
+              },
+              "host_kind": {
+                "type": "null"
+              },
+              "host": {
+                "type": "null"
+              },
+              "port": {
+                "type": "null"
+              },
+              "public_suffix": {
+                "type": "null"
+              },
+              "registrable_domain": {
+                "type": "null"
+              },
+              "suffix_rule": {
+                "type": "null"
+              },
+              "suffix_section": {
+                "type": "null"
+              },
+              "query_present": {
+                "type": "null"
+              },
+              "fragment_present": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "invalid"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error_code": {
+            "enum": [
+              "INPUT_TYPE",
+              "EMPTY_INPUT",
+              "INVALID_CODEPOINT",
+              "FORBIDDEN_CHARACTER",
+              "EMPTY_AUTHORITY",
+              "INVALID_AUTHORITY",
+              "INVALID_PORT",
+              "INVALID_IP",
+              "INVALID_HOST",
+              "INVALID_PERCENT_ESCAPE",
+              "INVALID_UTF8_ESCAPE"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "unsupported"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error_code": {
+            "enum": [
+              "INPUT_TOO_LONG",
+              "UNSUPPORTED_SCHEME",
+              "USERINFO_UNSUPPORTED",
+              "HOST_PERCENT_UNSUPPORTED",
+              "IP_UNSUPPORTED"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "internal_error"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error_code": {
+            "enum": [
+              "INTERNAL_CONTRACT_ERROR"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "x-feature-order": [
+    "raw_length",
+    "raw_at_count",
+    "raw_question_count",
+    "raw_hyphen_count",
+    "raw_equals_count",
+    "raw_dot_count",
+    "raw_hash_count",
+    "raw_percent_count",
+    "raw_plus_count",
+    "raw_dollar_count",
+    "raw_exclamation_count",
+    "raw_asterisk_count",
+    "raw_comma_count",
+    "raw_double_slash_count",
+    "raw_ascii_digit_count",
+    "raw_ascii_letter_count",
+    "explicit_https",
+    "host_is_ip",
+    "host_recovered",
+    "shortener_exact_host",
+    "brand_token_present",
+    "brand_token_in_subdomain",
+    "brand_token_in_path",
+    "host_hyphen_count",
+    "host_ascii_digit_count",
+    "host_length_gt20",
+    "subdomains_gt2",
+    "listed_final_label",
+    "keyword_distinct_count",
+    "nested_http_text",
+    "query_pair_count",
+    "raw_percent_triplet_count",
+    "host_character_entropy",
+    "raw_path_character_entropy",
+    "raw_ascii_digit_ratio",
+    "subdomain_label_count",
+    "raw_ascii_token_count"
+  ],
+  "x-legacy-order": [
+    "url_len",
+    "@",
+    "?",
+    "-",
+    "=",
+    ".",
+    "#",
+    "%",
+    "+",
+    "$",
+    "!",
+    "*",
+    ",",
+    "//",
+    "digits",
+    "letters",
+    "https",
+    "having_ip_address",
+    "abnormal_url",
+    "Shortining_Service",
+    "phish_has_brand",
+    "phish_brand_in_subdomain",
+    "phish_brand_in_path",
+    "phish_hyphen_count",
+    "phish_digit_count",
+    "phish_long_domain",
+    "phish_many_subdomains",
+    "phish_suspicious_tld",
+    "phish_keyword_count",
+    "phish_has_redirect",
+    "phish_param_count",
+    "phish_encoded_chars",
+    "adv_domain_ngram_entropy",
+    "adv_path_entropy",
+    "adv_digit_ratio",
+    "adv_subdomain_count",
+    "adv_token_count"
+  ],
+  "x-numeric-semantics": "JSON booleans are never numbers; finite binary64 only for numbers; int64 integers. JSON Schema alone does not establish finite IEEE type, exact order semantics, all metadata failure nulls, or cross-field invariants; contract checks also required."
+}

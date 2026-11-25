@@ -1,0 +1,3777 @@
+{
+  "contract_version": "1.0.0",
+  "origin": "All URL strings are synthetic. Counts, token lists, parsed components and histogram multiplicities manually authored from contract; no URL parser, old/new extractor, model or dataset accessed. The materializer computes only log2 and division from hand-entered counts. Reviewer independently recomputes.",
+  "cases": [
+    {
+      "id": "F01",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 14,
+          "6": 1,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test"
+        ],
+        "derivation": "8-code-point HTTPS prefix + 6 host =14; letters5+5=10; no path."
+      }
+    },
+    {
+      "id": "F02",
+      "input": {
+        "kind": "string",
+        "text": "http://a.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "http",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 13,
+          "6": 1,
+          "14": 1,
+          "16": 9,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "http",
+          "a",
+          "test"
+        ],
+        "derivation": "7+6=13; letters4+5=9."
+      }
+    },
+    {
+      "id": "F03",
+      "input": {
+        "kind": "string",
+        "text": "//a.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": "network_path",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 8,
+          "6": 1,
+          "14": 1,
+          "16": 5,
+          "37": 2
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "a",
+          "test"
+        ],
+        "derivation": "2+6=8; observed scheme absent, existing authority marker does not mean recovery."
+      }
+    },
+    {
+      "id": "F04",
+      "input": {
+        "kind": "string",
+        "text": "a.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": "absent",
+          "host_recovered": true,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 6,
+          "6": 1,
+          "16": 5,
+          "19": 1,
+          "37": 2
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "a",
+          "test"
+        ],
+        "derivation": "6 literal code points; internal // never counted; explicit_https=0."
+      }
+    },
+    {
+      "id": "F05",
+      "input": {
+        "kind": "string",
+        "text": "a.test:443/x"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": "absent",
+          "host_recovered": true,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": 443,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 12,
+          "6": 1,
+          "15": 3,
+          "16": 6,
+          "19": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "x": 1
+        },
+        "raw_path": "/x",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "a",
+          "test",
+          "443",
+          "x"
+        ],
+        "derivation": "6 host+4 port spelling+2 path=12; digit3; letters5+1=6."
+      }
+    },
+    {
+      "id": "F06",
+      "input": {
+        "kind": "string",
+        "text": "HTTPS://A.TEST"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 14,
+          "6": 1,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "HTTPS",
+          "A",
+          "TEST"
+        ],
+        "derivation": "Uppercase changes neither counts nor canonical H; explicit scheme comparison ASCII-insensitive."
+      }
+    },
+    {
+      "id": "F07",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test."
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 15,
+          "6": 2,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test"
+        ],
+        "derivation": "8+7=15; root dot counted raw, removed only H."
+      }
+    },
+    {
+      "id": "F08",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test:00443"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": 443,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 20,
+          "6": 1,
+          "14": 1,
+          "15": 5,
+          "16": 10,
+          "17": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "00443"
+        ],
+        "derivation": "14+6=20; raw5 digits while normalized port443."
+      }
+    },
+    {
+      "id": "F09",
+      "input": {
+        "kind": "string",
+        "text": "https://192.0.2.1/"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "ipv4",
+          "host": "192.0.2.1",
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 18,
+          "6": 3,
+          "14": 1,
+          "15": 6,
+          "16": 5,
+          "17": 1,
+          "18": 1,
+          "25": 6,
+          "37": 5
+        },
+        "host_histogram": {
+          "1": 2,
+          "9": 1,
+          "2": 2,
+          ".": 3,
+          "0": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "192",
+          "0",
+          "2",
+          "1"
+        ],
+        "derivation": "8+9+1=18; octets digits3+1+1+1=6; H histogram9."
+      }
+    },
+    {
+      "id": "F10",
+      "input": {
+        "kind": "string",
+        "text": "https://[::1]/"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "ipv6",
+          "host": "::1",
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 14,
+          "14": 1,
+          "15": 1,
+          "16": 5,
+          "17": 1,
+          "18": 1,
+          "25": 1,
+          "37": 2
+        },
+        "host_histogram": {
+          ":": 2,
+          "1": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "1"
+        ],
+        "derivation": "8+5 bracketed authority+1=14; H excludes brackets."
+      }
+    },
+    {
+      "id": "F11",
+      "input": {
+        "kind": "string",
+        "text": "https://faß.de/"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "xn--fa-hia.de",
+          "port": null,
+          "public_suffix": "de",
+          "registrable_domain": "xn--fa-hia.de",
+          "suffix_rule": "de",
+          "suffix_section": "ICANN",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 15,
+          "6": 1,
+          "14": 1,
+          "16": 9,
+          "17": 1,
+          "24": 3,
+          "37": 3
+        },
+        "host_histogram": {
+          "x": 1,
+          "n": 1,
+          "-": 3,
+          "f": 1,
+          "a": 2,
+          "h": 1,
+          "i": 1,
+          ".": 1,
+          "d": 1,
+          "e": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "fa",
+          "de"
+        ],
+        "derivation": "8+6+1=15 Unicode scalar values; raw letters5+fa2+de2=9; ß not ASCII. H length13: x n - - f a - h i a . d e."
+      }
+    },
+    {
+      "id": "F12",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/%70aypal"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 23,
+          "6": 1,
+          "8": 1,
+          "14": 1,
+          "15": 2,
+          "16": 15,
+          "17": 1,
+          "21": 1,
+          "23": 1,
+          "32": 1,
+          "37": 4,
+          "29": 1
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "%": 1,
+          "7": 1,
+          "0": 1,
+          "a": 2,
+          "y": 1,
+          "p": 1,
+          "l": 1
+        },
+        "raw_path": "/%70aypal",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "70aypal"
+        ],
+        "derivation": "14+9=23; letters10+aypal5=15; escape70 two rawdigits; decoded /paypal exact brand token. Historical keyword paypal is also present: keyword_count1."
+      }
+    },
+    {
+      "id": "F13",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/%2570aypal"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 25,
+          "6": 1,
+          "8": 1,
+          "14": 1,
+          "15": 4,
+          "16": 15,
+          "17": 1,
+          "32": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "%": 1,
+          "2": 1,
+          "5": 1,
+          "7": 1,
+          "0": 1,
+          "a": 2,
+          "y": 1,
+          "p": 1,
+          "l": 1
+        },
+        "raw_path": "/%2570aypal",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "2570aypal"
+        ],
+        "derivation": "14+11=25; decode once /%70aypal gives token70aypal, not paypal; percenttriplets1, not2."
+      }
+    },
+    {
+      "id": "F14",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/a%2Fb?x=%3F%23"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": true,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 29,
+          "3": 1,
+          "5": 1,
+          "6": 1,
+          "8": 3,
+          "14": 1,
+          "15": 4,
+          "16": 15,
+          "17": 1,
+          "31": 1,
+          "32": 3,
+          "37": 8
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "a": 1,
+          "%": 1,
+          "2": 1,
+          "F": 1,
+          "b": 1
+        },
+        "raw_path": "/a%2Fb",
+        "raw_query": "x=%3F%23",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "a",
+          "2Fb",
+          "x",
+          "3F",
+          "23"
+        ],
+        "derivation": "14+6+1+8=29; digits1+3=4; letters10+3+2=15; decode /a/b and x=?# does not change structure. One raw query pair."
+      }
+    },
+    {
+      "id": "F15",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/?a=&a=1&b&=x&&"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": true,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 29,
+          "3": 1,
+          "5": 3,
+          "6": 1,
+          "14": 1,
+          "15": 1,
+          "16": 14,
+          "17": 1,
+          "31": 4,
+          "37": 8
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "a=&a=1&b&=x&&",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "a",
+          "a",
+          "1",
+          "b",
+          "x"
+        ],
+        "derivation": "14+1+1+13=29. Ordered nonempty segments (a,empty),(a,1),(b,bare),(empty,x); final two empty segments discarded. Letters10+4=14."
+      }
+    },
+    {
+      "id": "F16",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/?q=a+b"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": true,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 21,
+          "3": 1,
+          "5": 1,
+          "6": 1,
+          "9": 1,
+          "14": 1,
+          "16": 13,
+          "17": 1,
+          "31": 1,
+          "37": 6
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "q=a+b",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "q",
+          "a",
+          "b"
+        ],
+        "derivation": "14+1+1+5=21; plus literal in decoded query; letters10+3=13."
+      }
+    },
+    {
+      "id": "F17",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/?u=HTTPS%3A%2F%2Fb.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": true,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 38,
+          "3": 1,
+          "5": 1,
+          "6": 2,
+          "8": 3,
+          "14": 1,
+          "15": 3,
+          "16": 24,
+          "17": 1,
+          "30": 1,
+          "31": 1,
+          "32": 3,
+          "37": 9
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "u=HTTPS%3A%2F%2Fb.test",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "u",
+          "HTTPS",
+          "3A",
+          "2F",
+          "2Fb",
+          "test"
+        ],
+        "derivation": "14+1+1+22=38; decoded Q u=HTTPS://b.test: left boundary =, nested indicator1, raw double_slash only original1."
+      }
+    },
+    {
+      "id": "F18",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/httpstuff"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 24,
+          "6": 1,
+          "14": 1,
+          "16": 19,
+          "17": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "h": 1,
+          "t": 3,
+          "p": 1,
+          "s": 1,
+          "u": 1,
+          "f": 2
+        },
+        "raw_path": "/httpstuff",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "httpstuff"
+        ],
+        "derivation": "14+10=24; no complete nested scheme delimiter; t in http + stuff gives3."
+      }
+    },
+    {
+      "id": "F19",
+      "input": {
+        "kind": "string",
+        "text": "https://paypal.a.test/login"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "paypal.a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 27,
+          "6": 2,
+          "14": 1,
+          "16": 21,
+          "17": 1,
+          "21": 1,
+          "22": 1,
+          "29": 2,
+          "36": 1,
+          "37": 5
+        },
+        "host_histogram": {
+          "p": 2,
+          "a": 3,
+          "y": 1,
+          "l": 1,
+          ".": 2,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "l": 1,
+          "o": 1,
+          "g": 1,
+          "i": 1,
+          "n": 1
+        },
+        "raw_path": "/login",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "paypal",
+          "a",
+          "test",
+          "login"
+        ],
+        "derivation": "8+13+6=27; letters5+11+5=21; subdomain paypal, keyword login, no brand path. Historical distinct keywords paypal and login give2."
+      }
+    },
+    {
+      "id": "F20",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/paypalish"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 24,
+          "6": 1,
+          "14": 1,
+          "16": 19,
+          "17": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "p": 2,
+          "a": 2,
+          "y": 1,
+          "l": 1,
+          "i": 1,
+          "s": 1,
+          "h": 1
+        },
+        "raw_path": "/paypalish",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "paypalish"
+        ],
+        "derivation": "14+10=24; substring alone is no brand token."
+      }
+    },
+    {
+      "id": "F21",
+      "input": {
+        "kind": "string",
+        "text": "https://bit.ly/"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "bit.ly",
+          "port": null,
+          "public_suffix": "ly",
+          "registrable_domain": "bit.ly",
+          "suffix_rule": "ly",
+          "suffix_section": "ICANN",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 15,
+          "6": 1,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "20": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "b": 1,
+          "i": 1,
+          "t": 1,
+          ".": 1,
+          "l": 1,
+          "y": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "bit",
+          "ly"
+        ],
+        "derivation": "8+6+1=15; exact shortener."
+      }
+    },
+    {
+      "id": "F22",
+      "input": {
+        "kind": "string",
+        "text": "https://bit.ly.a.test/"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "bit.ly.a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 22,
+          "6": 3,
+          "14": 1,
+          "16": 15,
+          "17": 1,
+          "36": 2,
+          "37": 5
+        },
+        "host_histogram": {
+          "b": 1,
+          "i": 1,
+          "t": 3,
+          ".": 3,
+          "l": 1,
+          "y": 1,
+          "a": 1,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "bit",
+          "ly",
+          "a",
+          "test"
+        ],
+        "derivation": "8+13+1=22; substring bit.ly not an exact shortener H; S bit.ly has2 labels."
+      }
+    },
+    {
+      "id": "F23",
+      "input": {
+        "kind": "string",
+        "text": "https://a.co.uk"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.co.uk",
+          "port": null,
+          "public_suffix": "co.uk",
+          "registrable_domain": "a.co.uk",
+          "suffix_rule": "co.uk",
+          "suffix_section": "ICANN",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 15,
+          "6": 2,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 2,
+          "c": 1,
+          "o": 1,
+          "u": 1,
+          "k": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "co",
+          "uk"
+        ],
+        "derivation": "8+7=15; PSL two-label suffix, S empty."
+      }
+    },
+    {
+      "id": "F24",
+      "input": {
+        "kind": "string",
+        "text": "https://a.github.io"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.github.io",
+          "port": null,
+          "public_suffix": "github.io",
+          "registrable_domain": "a.github.io",
+          "suffix_rule": "github.io",
+          "suffix_section": "PRIVATE",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 19,
+          "6": 2,
+          "14": 1,
+          "16": 14,
+          "17": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 2,
+          "g": 1,
+          "i": 2,
+          "t": 1,
+          "h": 1,
+          "u": 1,
+          "b": 1,
+          "o": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "github",
+          "io"
+        ],
+        "derivation": "8+11=19; PRIVATE suffix counts a.github.io as registrable tenant, S empty."
+      }
+    },
+    {
+      "id": "F25",
+      "input": {
+        "kind": "string",
+        "text": "https://x.a.github.io"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "x.a.github.io",
+          "port": null,
+          "public_suffix": "github.io",
+          "registrable_domain": "a.github.io",
+          "suffix_rule": "github.io",
+          "suffix_section": "PRIVATE",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 21,
+          "6": 3,
+          "14": 1,
+          "16": 15,
+          "17": 1,
+          "36": 1,
+          "37": 5
+        },
+        "host_histogram": {
+          "x": 1,
+          "a": 1,
+          ".": 3,
+          "g": 1,
+          "i": 2,
+          "t": 1,
+          "h": 1,
+          "u": 1,
+          "b": 1,
+          "o": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "x",
+          "a",
+          "github",
+          "io"
+        ],
+        "derivation": "8+13=21; only x is a subdomain label under PRIVATE suffix."
+      }
+    },
+    {
+      "id": "F26",
+      "input": {
+        "kind": "string",
+        "text": "https://a.ck"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.ck",
+          "port": null,
+          "public_suffix": "a.ck",
+          "registrable_domain": null,
+          "suffix_rule": "*.ck",
+          "suffix_section": "ICANN",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 12,
+          "6": 1,
+          "14": 1,
+          "16": 8,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "c": 1,
+          "k": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "ck"
+        ],
+        "derivation": "8+4=12; wildcard makes whole H public suffix; no registrable domain and S empty."
+      }
+    },
+    {
+      "id": "F27",
+      "input": {
+        "kind": "string",
+        "text": "https://a.www.ck"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.www.ck",
+          "port": null,
+          "public_suffix": "ck",
+          "registrable_domain": "www.ck",
+          "suffix_rule": "!www.ck",
+          "suffix_section": "ICANN",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 16,
+          "6": 2,
+          "14": 1,
+          "16": 11,
+          "17": 1,
+          "36": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 2,
+          "w": 3,
+          "c": 1,
+          "k": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "www",
+          "ck"
+        ],
+        "derivation": "8+8=16; exception public suffix ck, registrable www.ck and S=a."
+      }
+    },
+    {
+      "id": "F28",
+      "input": {
+        "kind": "string",
+        "text": "https://b.a.zz"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "b.a.zz",
+          "port": null,
+          "public_suffix": "zz",
+          "registrable_domain": "a.zz",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 14,
+          "6": 2,
+          "14": 1,
+          "16": 9,
+          "17": 1,
+          "36": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "b": 1,
+          ".": 2,
+          "a": 1,
+          "z": 2
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "b",
+          "a",
+          "zz"
+        ],
+        "derivation": "8+6=14; default* final label zz is not proof registered suffix/ownership."
+      }
+    },
+    {
+      "id": "F29",
+      "input": {
+        "kind": "string",
+        "text": "https://a.xyz"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.xyz",
+          "port": null,
+          "public_suffix": "xyz",
+          "registrable_domain": "a.xyz",
+          "suffix_rule": "xyz",
+          "suffix_section": "ICANN",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 13,
+          "6": 1,
+          "14": 1,
+          "16": 9,
+          "17": 1,
+          "28": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "xyz"
+        ],
+        "derivation": "8+5=13; listed label indicator only, no risk inference."
+      }
+    },
+    {
+      "id": "F30",
+      "input": {
+        "kind": "string",
+        "text": "https://aaaaaaaaaaaaaaaaaaaaa.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "aaaaaaaaaaaaaaaaaaaaa.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "aaaaaaaaaaaaaaaaaaaaa.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 34,
+          "6": 1,
+          "14": 1,
+          "16": 30,
+          "17": 1,
+          "26": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 21,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "aaaaaaaaaaaaaaaaaaaaa",
+          "test"
+        ],
+        "derivation": "8+(21+5)=34; host26>20; letters5+21+4=30."
+      }
+    },
+    {
+      "id": "F31",
+      "input": {
+        "kind": "string",
+        "text": "https://a.b.c.d.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.b.c.d.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "d.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 20,
+          "6": 4,
+          "14": 1,
+          "16": 13,
+          "17": 1,
+          "27": 1,
+          "36": 3,
+          "37": 6
+        },
+        "host_histogram": {
+          "a": 1,
+          "b": 1,
+          "c": 1,
+          "d": 1,
+          ".": 4,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "b",
+          "c",
+          "d",
+          "test"
+        ],
+        "derivation": "8+12=20; S a.b.c has3 labels; raw letters5+4+4=13."
+      }
+    },
+    {
+      "id": "F32",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/@$!*,#??"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": true
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 23,
+          "2": 1,
+          "3": 2,
+          "6": 1,
+          "7": 1,
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "@": 1,
+          "$": 1,
+          "!": 1,
+          "*": 1,
+          ",": 1
+        },
+        "raw_path": "/@$!*,",
+        "raw_query": "",
+        "raw_fragment": "??",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test"
+        ],
+        "derivation": "14+6+1+2=23; first# starts F; questionmarks in F do not create query; @ in P allowed."
+      }
+    },
+    {
+      "id": "F33",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test?"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": true,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 15,
+          "3": 1,
+          "6": 1,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test"
+        ],
+        "derivation": "14+1=15; present-empty query, no pair."
+      }
+    },
+    {
+      "id": "F34",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/aa//"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 19,
+          "6": 1,
+          "14": 2,
+          "16": 12,
+          "17": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 3,
+          "a": 2
+        },
+        "raw_path": "/aa//",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "aa"
+        ],
+        "derivation": "14+5=19; raw // two including original; raw P histogram slash3 a2, no slash collapse."
+      }
+    },
+    {
+      "id": "E01",
+      "input": {
+        "kind": "json",
+        "value": null
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INPUT_TYPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "null is not a string; never coerce."
+    },
+    {
+      "id": "E02",
+      "input": {
+        "kind": "json",
+        "value": 42
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INPUT_TYPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Integer is not a string."
+    },
+    {
+      "id": "E03",
+      "input": {
+        "kind": "tagged_nonjson",
+        "value_tag": "NaN"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INPUT_TYPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "NaN tagged because JSON cannot represent it; nonstring before numeric finiteness."
+    },
+    {
+      "id": "E04",
+      "input": {
+        "kind": "string",
+        "text": ""
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "EMPTY_INPUT",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Empty R."
+    },
+    {
+      "id": "E05",
+      "input": {
+        "kind": "string",
+        "text": " https://a.test"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "FORBIDDEN_CHARACTER",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "No whitespace trim."
+    },
+    {
+      "id": "E06",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/\n"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "FORBIDDEN_CHARACTER",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Literal LF anywhere rejected."
+    },
+    {
+      "id": "E07",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/\\x"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "FORBIDDEN_CHARACTER",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "No browser backslash repair."
+    },
+    {
+      "id": "E08",
+      "input": {
+        "kind": "string",
+        "text": "ftp://a.test"
+      },
+      "expected": {
+        "status": "unsupported",
+        "error_code": "UNSUPPORTED_SCHEME",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Only observed HTTP(S) accepted."
+    },
+    {
+      "id": "E09",
+      "input": {
+        "kind": "string",
+        "text": "https:a.test"
+      },
+      "expected": {
+        "status": "unsupported",
+        "error_code": "UNSUPPORTED_SCHEME",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "No insertion of missing authority slashes."
+    },
+    {
+      "id": "E10",
+      "input": {
+        "kind": "string",
+        "text": "https:///a.test"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "EMPTY_AUTHORITY",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Empty authority precedes DNS validation."
+    },
+    {
+      "id": "E11",
+      "input": {
+        "kind": "string",
+        "text": "https://u:p@a.test/"
+      },
+      "expected": {
+        "status": "unsupported",
+        "error_code": "USERINFO_UNSUPPORTED",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Credentials not accepted; never log raw actual input."
+    },
+    {
+      "id": "E12",
+      "input": {
+        "kind": "string",
+        "text": "https://[::1/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_AUTHORITY",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Unclosed bracket."
+    },
+    {
+      "id": "E13",
+      "input": {
+        "kind": "string",
+        "text": "https://2001:db8::1/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_AUTHORITY",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "IPv6 must have brackets."
+    },
+    {
+      "id": "E14",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test:/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_PORT",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Empty explicit port."
+    },
+    {
+      "id": "E15",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test:65536/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_PORT",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Port range."
+    },
+    {
+      "id": "E16",
+      "input": {
+        "kind": "string",
+        "text": "https://%61.test/"
+      },
+      "expected": {
+        "status": "unsupported",
+        "error_code": "HOST_PERCENT_UNSUPPORTED",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Even syntactically valid percent host is unsupported."
+    },
+    {
+      "id": "E17",
+      "input": {
+        "kind": "string",
+        "text": "https://[fe80::1%25eth0]/"
+      },
+      "expected": {
+        "status": "unsupported",
+        "error_code": "HOST_PERCENT_UNSUPPORTED",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Host percent stage precedes zone diagnostics; percent zone source preserved privately."
+    },
+    {
+      "id": "E18",
+      "input": {
+        "kind": "string",
+        "text": "https://[v1.a]/"
+      },
+      "expected": {
+        "status": "unsupported",
+        "error_code": "IP_UNSUPPORTED",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "IPvFuture unsupported."
+    },
+    {
+      "id": "E19",
+      "input": {
+        "kind": "string",
+        "text": "https://999.1.2.3/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_IP",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Out of range dotted quad cannot fall through DNS."
+    },
+    {
+      "id": "E20",
+      "input": {
+        "kind": "string",
+        "text": "https://01.2.3.4/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_IP",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Strict dotted decimal rejects leading zero."
+    },
+    {
+      "id": "E21",
+      "input": {
+        "kind": "string",
+        "text": "https://a/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_HOST",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Single-label DNS not eligible."
+    },
+    {
+      "id": "E22",
+      "input": {
+        "kind": "string",
+        "text": "https://-a.test/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_HOST",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "STD3/checkhyphens rejects label-leading hyphen."
+    },
+    {
+      "id": "E23",
+      "input": {
+        "kind": "string",
+        "text": "https://a..test/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_HOST",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Repeated empty DNS label."
+    },
+    {
+      "id": "E24",
+      "input": {
+        "kind": "string",
+        "text": "https://xn--.test/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_HOST",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Invalid A-label is not ignored."
+    },
+    {
+      "id": "E25",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/%2"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_PERCENT_ESCAPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Incomplete path escape."
+    },
+    {
+      "id": "E26",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/?x=%FF"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_UTF8_ESCAPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Strict UTF8 query, no replacement."
+    },
+    {
+      "id": "E27",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/#%GG"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_PERCENT_ESCAPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Fragment escapes validated too."
+    },
+    {
+      "id": "E28",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/%FF?q=%GG"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_PERCENT_ESCAPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "All component percent grammar is checked before UTF8: Q invalid-percent precedes P invalidUTF8."
+    },
+    {
+      "id": "E29",
+      "input": {
+        "kind": "json",
+        "value": true
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INPUT_TYPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Boolean is not accepted as integer/string."
+    },
+    {
+      "id": "E30",
+      "input": {
+        "kind": "string",
+        "text": "https://1.2.3/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_IP",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "All-numeric dotted host cannot be DNS fallback."
+    },
+    {
+      "id": "E31",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/ "
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "FORBIDDEN_CHARACTER",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Raw Unicode White_Space rejected."
+    },
+    {
+      "id": "E32",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test:bad/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_PORT",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Explicit authority nondecimal port."
+    },
+    {
+      "id": "E33",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test../"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_HOST",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Only one root dot allowed."
+    },
+    {
+      "id": "F35",
+      "input": {
+        "kind": "string",
+        "text": "https://a-b.test/"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a-b.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a-b.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 17,
+          "4": 1,
+          "6": 1,
+          "14": 1,
+          "16": 11,
+          "17": 1,
+          "24": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          "-": 1,
+          "b": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "b",
+          "test"
+        ],
+        "derivation": "8+8+1=17; ASCIIletters5+6=11; rawhyphen1/Hhyphen1; pathslash entropy0."
+      }
+    },
+    {
+      "id": "F36",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/?x=%26%3D"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": true,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 24,
+          "3": 1,
+          "5": 1,
+          "6": 1,
+          "8": 2,
+          "14": 1,
+          "15": 3,
+          "16": 12,
+          "17": 1,
+          "31": 1,
+          "32": 2,
+          "37": 6
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "x=%26%3D",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "x",
+          "26",
+          "3D"
+        ],
+        "derivation": "14+1+1+8=24; digit263=3; ASCIIletters10+x+D=12; one raw segment despite decoded x=&=."
+      }
+    },
+    {
+      "id": "F37",
+      "input": {
+        "kind": "string",
+        "text": "a。test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": "absent",
+          "host_recovered": true,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 6,
+          "16": 5,
+          "19": 1,
+          "37": 2
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "a",
+          "test"
+        ],
+        "derivation": "Raw U+3002 is one nonASCII codepoint, not rawdot; six total; IDNA mapping recovers H a.test, never HTTPS."
+      }
+    },
+    {
+      "id": "F38",
+      "input": {
+        "kind": "string",
+        "text": "https://[::ffff:192.0.2.128]/"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "ipv6",
+          "host": "::ffff:c000:280",
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 29,
+          "6": 3,
+          "14": 1,
+          "15": 8,
+          "16": 9,
+          "17": 1,
+          "18": 1,
+          "25": 6,
+          "37": 6
+        },
+        "host_histogram": {
+          ":": 4,
+          "f": 4,
+          "c": 1,
+          "0": 4,
+          "2": 1,
+          "8": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "ffff",
+          "192",
+          "0",
+          "2",
+          "128"
+        ],
+        "derivation": "8 prefix+20 bracketed source+1 slash=29; raw IPv4 octetdigitcounts3+1+1+3=8, H canonicalpurehex digitcount3+3=6; Hhist15."
+      }
+    },
+    {
+      "id": "F39",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/xhttp://b.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 29,
+          "6": 2,
+          "14": 2,
+          "16": 20,
+          "17": 1,
+          "37": 6
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 3,
+          "x": 1,
+          "h": 1,
+          "t": 4,
+          "p": 1,
+          ":": 1,
+          "b": 1,
+          ".": 1,
+          "e": 1,
+          "s": 1
+        },
+        "raw_path": "/xhttp://b.test",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "xhttp",
+          "b",
+          "test"
+        ],
+        "derivation": "14+15=29; pathslash3,x1,h1,t4,p1,colon1,b1,dot1,e1,s1=15; leftalnum x excludes nested http scheme. ASCIIletters10+5+5=20."
+      }
+    },
+    {
+      "id": "F40",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/##"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": true
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 17,
+          "6": 1,
+          "7": 2,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1
+        },
+        "raw_path": "/",
+        "raw_query": "",
+        "raw_fragment": "#",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test"
+        ],
+        "derivation": "14+1+2=17; first# starts F, second retained as fragment text; no query."
+      }
+    },
+    {
+      "id": "F41",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/%20"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 18,
+          "6": 1,
+          "8": 1,
+          "14": 1,
+          "15": 2,
+          "16": 10,
+          "17": 1,
+          "32": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "%": 1,
+          "2": 1,
+          "0": 1
+        },
+        "raw_path": "/%20",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "20"
+        ],
+        "derivation": "14+4=18; percentencoded space is allowed in decoded signal view; rawP fouruniquechars entropy2."
+      }
+    },
+    {
+      "id": "E34",
+      "input": {
+        "kind": "string",
+        "text": "https://0x7f.0.0.1/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_IP",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Allnumeric/hex candidate cannot fallback DNS."
+    },
+    {
+      "id": "E35",
+      "input": {
+        "kind": "string",
+        "text": "https://1.2.3.4./"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_IP",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "IP rootdot is explicitly rejected."
+    },
+    {
+      "id": "E36",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test:0x50/"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_PORT",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Ports decimalonly."
+    },
+    {
+      "id": "E37",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/#%FF"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "INVALID_UTF8_ESCAPE",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Fragment strictUTF8 also applies."
+    },
+    {
+      "id": "E38",
+      "input": {
+        "kind": "string",
+        "text": "/relative/path"
+      },
+      "expected": {
+        "status": "invalid",
+        "error_code": "EMPTY_AUTHORITY",
+        "features": null,
+        "metadata": {
+          "source_scheme": null,
+          "scheme_form": null,
+          "host_recovered": null,
+          "host_kind": null,
+          "host": null,
+          "port": null,
+          "public_suffix": null,
+          "registrable_domain": null,
+          "suffix_rule": null,
+          "suffix_section": null,
+          "query_present": null,
+          "fragment_present": null
+        }
+      },
+      "derivation": "Leading slash has no authority under recovery view; EMPTY_AUTHORITY before single-label DNS validation."
+    },
+    {
+      "id": "F42",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/login?x=login#login"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": true,
+          "fragment_present": true
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 34,
+          "3": 1,
+          "5": 1,
+          "6": 1,
+          "7": 1,
+          "14": 1,
+          "16": 26,
+          "17": 1,
+          "29": 1,
+          "31": 1,
+          "37": 7
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "l": 1,
+          "o": 1,
+          "g": 1,
+          "i": 1,
+          "n": 1
+        },
+        "raw_path": "/login",
+        "raw_query": "x=login",
+        "raw_fragment": "login",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "login",
+          "x",
+          "login",
+          "login"
+        ],
+        "derivation": "14+6+1+7+1+5=34; letters10+5+6+5=26; repeated login across P/Q/F counts one distinct keyword, not3."
+      }
+    },
+    {
+      "id": "F43",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/é"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 16,
+          "6": 1,
+          "14": 1,
+          "16": 10,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "é": 1
+        },
+        "raw_path": "/é",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test"
+        ],
+        "derivation": "14+2=16 codepoints; é raw nonASCII and not raw ASCIIletter/token; P / and é each1."
+      }
+    },
+    {
+      "id": "F44",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test/%C3%A9"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 21,
+          "6": 1,
+          "8": 2,
+          "14": 1,
+          "15": 2,
+          "16": 12,
+          "17": 1,
+          "32": 2,
+          "37": 5
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {
+          "/": 1,
+          "%": 2,
+          "C": 1,
+          "3": 1,
+          "A": 1,
+          "9": 1
+        },
+        "raw_path": "/%C3%A9",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "C3",
+          "A9"
+        ],
+        "derivation": "14+7=21; raw lettersC/A two, digits3/9 two; decoded P /é matches F43 signalview but raw entropy/counts differ."
+      }
+    },
+    {
+      "id": "F45",
+      "input": {
+        "kind": "string",
+        "text": "https://aaaaaaaaaaaaaaa.test"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "aaaaaaaaaaaaaaa.test",
+          "port": null,
+          "public_suffix": "test",
+          "registrable_domain": "aaaaaaaaaaaaaaa.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 28,
+          "6": 1,
+          "14": 1,
+          "16": 24,
+          "17": 1,
+          "37": 3
+        },
+        "host_histogram": {
+          "a": 15,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "aaaaaaaaaaaaaaa",
+          "test"
+        ],
+        "derivation": "8+(15+5)=28; H length20 does not exceed20, Hhist20; letters5+15+4=24."
+      }
+    },
+    {
+      "id": "F46",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test:0"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": 0,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 16,
+          "6": 1,
+          "14": 1,
+          "15": 1,
+          "16": 10,
+          "17": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "0"
+        ],
+        "derivation": "14+2=16; syntactically valid port0; no reachabilityclaim."
+      }
+    },
+    {
+      "id": "F47",
+      "input": {
+        "kind": "string",
+        "text": "https://a.test:65535"
+      },
+      "expected": {
+        "status": "ok",
+        "error_code": null,
+        "metadata": {
+          "source_scheme": "https",
+          "scheme_form": "explicit",
+          "host_recovered": false,
+          "host_kind": "dns",
+          "host": "a.test",
+          "port": 65535,
+          "public_suffix": "test",
+          "registrable_domain": "a.test",
+          "suffix_rule": "*",
+          "suffix_section": "DEFAULT",
+          "query_present": false,
+          "fragment_present": false
+        }
+      },
+      "manual": {
+        "literal_nonzero_slots": {
+          "1": 20,
+          "6": 1,
+          "14": 1,
+          "15": 5,
+          "16": 10,
+          "17": 1,
+          "37": 4
+        },
+        "host_histogram": {
+          "a": 1,
+          ".": 1,
+          "t": 2,
+          "e": 1,
+          "s": 1
+        },
+        "path_histogram": {},
+        "raw_path": "",
+        "raw_query": "",
+        "raw_fragment": "",
+        "raw_ascii_tokens": [
+          "https",
+          "a",
+          "test",
+          "65535"
+        ],
+        "derivation": "14+6=20; upper endpoint65535 accepted, unlikeE15."
+      }
+    }
+  ],
+  "invariants": [
+    {
+      "id": "I01",
+      "given": "An otherwise successful proposed result contains NaN or ±Infinity in any feature.",
+      "expected": "status=internal_error,error_code=INTERNAL_CONTRACT_ERROR,features=null; never serialize nonstandard JSON numeric literals."
+    },
+    {
+      "id": "I02",
+      "given": "Typed input is a string of 65,537 letter a codepoints. Represent as repetition recipe, do not materialize.",
+      "expected": "unsupported/INPUT_TOO_LONG before host validation."
+    },
+    {
+      "id": "I03",
+      "given": "Typed string contains lone surrogate U+D800; use typed escape recipe, not invalid UTF8 file bytes.",
+      "expected": "invalid/INVALID_CODEPOINT."
+    },
+    {
+      "id": "I04",
+      "given": "Host with 64-letter DNS label followed by .test (typed repetition recipe).",
+      "expected": "invalid/INVALID_HOST (DNS label length)."
+    }
+  ]
+}

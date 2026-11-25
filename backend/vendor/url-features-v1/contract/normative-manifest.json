@@ -1,0 +1,44 @@
+{
+  "contract": "phishaudit-url-features",
+  "files": {
+    "contract.md": {
+      "sha256": "236bf7d395a9fd9be7ca9952770bce4446706b2745e411d94b59e26537d09f03",
+      "size_bytes": 19199
+    },
+    "feature-schema.json": {
+      "sha256": "e4a21cc1ba52ce956272d733d5843ccb63ca2b11860b7dc3d41f62f72b2e6ae6",
+      "size_bytes": 17639
+    },
+    "fixtures/README.md": {
+      "sha256": "e3cb4e02433a95647cf33887029ba2dc25610bb4dccc321eb78f1a143ec41bd5",
+      "size_bytes": 5002
+    },
+    "fixtures/golden-fixtures.json": {
+      "sha256": "6e1eac5e7165d1c9a4efab4ade241dbd699bad7cd1ff86cb559ceca9f8c68bbc",
+      "size_bytes": 117903
+    },
+    "fixtures/manual-annotations.json": {
+      "sha256": "df4ff245afb5bb37973ae1786cdca35e729309083b065fc73a022af2db08bf7b",
+      "size_bytes": 92450
+    },
+    "references/IdnaMappingTable-17.0.0.txt": {
+      "sha256": "87f05505dc026fdb2bff16132bdc68a8014675836882a9a2b1844540ad3be382",
+      "size_bytes": 787378
+    },
+    "references/asset-manifest.json": {
+      "sha256": "e4001a62c822853ef806022b578022171fd1d641ce1093ff2a292d06c5b0f4e3",
+      "size_bytes": 1136
+    },
+    "references/public_suffix_list.dat": {
+      "sha256": "b3f2d087e147f5fb4226710acb180d4f2361a281473e234d61005e46afdc8891",
+      "size_bytes": 339575
+    },
+    "vocabularies.json": {
+      "sha256": "0160d13f3b7acf5909c8a09de25b8e1b5f2bf1e9b8cd512e31667ff21b63e945",
+      "size_bytes": 1196
+    }
+  },
+  "identity_rule": "bundle_sha256 is SHA256 of exact bytes of this manifest; this manifest excludes itself and non-normative evidence/drafts/tooling",
+  "status": "selected specification; implementation not performed",
+  "version": "1.0.0"
+}

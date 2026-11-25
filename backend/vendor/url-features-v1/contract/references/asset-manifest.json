@@ -1,0 +1,25 @@
+{
+  "assets": [
+    {
+      "path": "contracts/url-features-v1/references/public_suffix_list.dat",
+      "source_url": "https://publicsuffix.org/list/public_suffix_list.dat",
+      "version": "2026-11-12_19-44-12_UTC / aa004f90b4cbe1c54ea96375622eca83d76059f0",
+      "retrieved_utc": "2026-11-13T05:51:39.405133+00:00",
+      "sha256": "b3f2d087e147f5fb4226710acb180d4f2361a281473e234d61005e46afdc8891",
+      "size_bytes": 339575
+    },
+    {
+      "path": "contracts/url-features-v1/references/IdnaMappingTable-17.0.0.txt",
+      "source_url": "https://www.unicode.org/Public/17.0.0/idna/IdnaMappingTable.txt",
+      "version": "17.0.0",
+      "retrieved_utc": "2026-11-13T05:51:39.405392+00:00",
+      "sha256": "87f05505dc026fdb2bff16132bdc68a8014675836882a9a2b1844540ad3be382",
+      "size_bytes": 787378
+    }
+  ],
+  "scope": "Normative reference rule tables only; no training/evaluation datasets or extractor implementation",
+  "acquisition_notes": [
+    "PSL curl in sandbox failed DNS; authorized retry succeeded.",
+    "Legacy Unicode /Public/idna/17.0.0 path returned404; verified /Public/17.0.0/idna path succeeded."
+  ]
+}

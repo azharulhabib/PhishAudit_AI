@@ -1,0 +1,68 @@
+{
+  "bundle_sha256": "217767dd2fcf545dec381d62b3059b49b61f6d7bd43180f3950f0c6008f5c58e",
+  "contract_version": "1.0.0",
+  "files": {
+    "contract/contract.md": {
+      "sha256": "236bf7d395a9fd9be7ca9952770bce4446706b2745e411d94b59e26537d09f03",
+      "size_bytes": 19199
+    },
+    "contract/feature-schema.json": {
+      "sha256": "e4a21cc1ba52ce956272d733d5843ccb63ca2b11860b7dc3d41f62f72b2e6ae6",
+      "size_bytes": 17639
+    },
+    "contract/fixtures/README.md": {
+      "sha256": "e3cb4e02433a95647cf33887029ba2dc25610bb4dccc321eb78f1a143ec41bd5",
+      "size_bytes": 5002
+    },
+    "contract/fixtures/golden-fixtures.json": {
+      "sha256": "6e1eac5e7165d1c9a4efab4ade241dbd699bad7cd1ff86cb559ceca9f8c68bbc",
+      "size_bytes": 117903
+    },
+    "contract/fixtures/manual-annotations.json": {
+      "sha256": "df4ff245afb5bb37973ae1786cdca35e729309083b065fc73a022af2db08bf7b",
+      "size_bytes": 92450
+    },
+    "contract/normative-manifest.json": {
+      "sha256": "217767dd2fcf545dec381d62b3059b49b61f6d7bd43180f3950f0c6008f5c58e",
+      "size_bytes": 1672
+    },
+    "contract/references/IdnaMappingTable-17.0.0.txt": {
+      "sha256": "87f05505dc026fdb2bff16132bdc68a8014675836882a9a2b1844540ad3be382",
+      "size_bytes": 787378
+    },
+    "contract/references/asset-manifest.json": {
+      "sha256": "e4001a62c822853ef806022b578022171fd1d641ce1093ff2a292d06c5b0f4e3",
+      "size_bytes": 1136
+    },
+    "contract/references/public_suffix_list.dat": {
+      "sha256": "b3f2d087e147f5fb4226710acb180d4f2361a281473e234d61005e46afdc8891",
+      "size_bytes": 339575
+    },
+    "contract/vocabularies.json": {
+      "sha256": "0160d13f3b7acf5909c8a09de25b8e1b5f2bf1e9b8cd512e31667ff21b63e945",
+      "size_bytes": 1196
+    },
+    "dependencies/wheel-manifest.json": {
+      "sha256": "47d9a46ed0a8363f5c802e4706c22984d74a18986ff181a04ff478dd16cada7d",
+      "size_bytes": 2071
+    },
+    "src/phishaudit_features/__init__.py": {
+      "sha256": "5667678135285e32217c5777c2af31a6219bcf778963a6d0de18a7e29719a6b5",
+      "size_bytes": 191
+    },
+    "src/phishaudit_features/extractor.py": {
+      "sha256": "4fbb2ce6e5fd17211bfa5235f674caf3cb612108c797a7f1785d1db2e75e7c01",
+      "size_bytes": 16237
+    },
+    "src/phishaudit_features/idna_profile.py": {
+      "sha256": "254cca3b217275316a2c40c24113f7925ce068b181dbff58fa2b3e0e9309ef7f",
+      "size_bytes": 5155
+    },
+    "src/phishaudit_features/psl.py": {
+      "sha256": "4834d98fa5dc65c06f4abc09501090a1511cb1bc1079190b9820cfa6d40f9ab2",
+      "size_bytes": 2087
+    }
+  },
+  "origin": "byte-identical copy of the research workspace prototypes/url-features-v1 and contracts/url-features-v1; do not edit",
+  "package": "phishaudit_features"
+}
