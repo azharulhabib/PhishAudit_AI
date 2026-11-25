@@ -57,8 +57,8 @@ def test_idempotent_on_ordinary_urls(url):
 def test_predict_normalizes_before_extraction():
     tree = ast.parse((Path(__file__).resolve().parents[1] / "ml_engine.py").read_text())
     predict = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "predict")
-    calls = [n for n in ast.walk(predict) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)]
-    names = [c.func.id for c in sorted(calls, key=lambda c: (c.lineno, c.col_offset))]
-    assert "normalize_url" in names and "extract_features" in names
-    inner = [n for n in ast.walk(predict) if isinstance(n, ast.Call) and getattr(n.func, "id", "") == "extract_features"][0]
-    assert any(isinstance(a, ast.Call) and getattr(a.func, "id", "") == "normalize_url" for a in inner.args)
+    called = {n.func.id for n in ast.walk(predict) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)}
+    assert "features_for_url" in called
+    assert "extract_features" not in called
+    source = (Path(__file__).resolve().parents[1] / "url_features.py").read_text()
+    assert "normalize_url(url)" in source

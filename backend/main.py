@@ -1,4 +1,5 @@
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,16 +9,32 @@ from urllib.parse import urlparse
 from connection import SessionLocal, engine, get_db
 
 from database.models import AuditLog, Base, ModelMetrics
+import ml_engine
 from ml_engine import predict
 from domain_gate import classify_domain
 from hvt_domains import detect_combo_squatting, detect_high_risk_keywords
 
 
 logger = logging.getLogger("phishaudit")
+startup_logger = logging.getLogger("uvicorn.error")
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="PhishAudit AI API")
+
+@asynccontextmanager
+async def lifespan(app):
+    if ml_engine.load_model():
+        info = ml_engine.model_info()
+        startup_logger.info("Model verified and loaded (sha256 %s, cutoff %r).", info["model_sha256"], info["serving_cutoff"])
+    else:
+        startup_logger.error(
+            "MODEL UNAVAILABLE (%s). Audits that reach the model will return Unknown until this is fixed.",
+            ml_engine.model_info()["model_error"],
+        )
+    yield
+
+
+app = FastAPI(title="PhishAudit AI API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,7 +53,8 @@ class URLAuditRequest(BaseModel):
 def home():
     return {
         "status": "online",
-        "service": "PhishAudit AI API"
+        "service": "PhishAudit AI API",
+        "model": ml_engine.model_info()
     }
 
 @app.post("/audit")
@@ -117,12 +135,13 @@ async def audit_url(
         }
 
     status = "Phishing" if result["score"] >= threshold else "Safe"
+    display_score = round(result["score"], 4)
 
 
     audit_log = AuditLog(
         url=url,
         result=status,
-        score=result["score"],
+        score=display_score,
         features_used=result["features"]
     )
     db.add(audit_log)
@@ -132,7 +151,7 @@ async def audit_url(
     return {
         "url":            url,
         "status":         status,
-        "score":          result["score"],
+        "score":          display_score,
         "db_id":          audit_log.id,
         "recommendation": "block" if status == "Phishing" else "allow",
         "tier":           tier,

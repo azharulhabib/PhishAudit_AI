@@ -1,4 +1,4 @@
-"""Test setup: in-memory SQLite, stubbed model, no .env, no pickle loading."""
+"""Test setup: in-memory SQLite, no .env, and no real model unless a test opts in."""
 import os
 import sys
 import types
@@ -13,13 +13,9 @@ _dotenv = types.ModuleType("dotenv")
 _dotenv.load_dotenv = lambda *a, **k: False
 sys.modules["dotenv"] = _dotenv
 
-# Stub ml_engine so rf_model.pkl is never loaded.
-_ml = types.ModuleType("ml_engine")
-_ml.predict = lambda url: {
-    "status": "Safe", "score": 0.0, "threshold": 0.5,
-    "features": {}, "error": None,
-}
-sys.modules["ml_engine"] = _ml
+# Point the served model at a path that does not exist, so no test loads the
+# real model by accident. Tests that need a model set their own path and hash.
+os.environ["PHISHAUDIT_MODEL_PATH"] = "/nonexistent/phishaudit-test-model.joblib"
 
 from sqlalchemy import create_engine  # noqa: E402
 from sqlalchemy.orm import sessionmaker  # noqa: E402

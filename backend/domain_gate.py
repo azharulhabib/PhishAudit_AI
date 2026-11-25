@@ -1,4 +1,5 @@
 from trusted_domains import TRUSTED_DOMAINS
+from serving_config import SERVING_CUTOFF
 
 
 def _levenshtein(s1: str, s2: str) -> int:
@@ -67,7 +68,7 @@ def classify_domain(hostname: str) -> dict:
 
     Tier 3 — Unknown domain (edit distance 3+):
         No significant similarity to trusted domains.
-        ML threshold: 0.75 (standard).
+        ML threshold: the serving cutoff (serving_config.SERVING_CUTOFF).
 
     Returns:
         tier (int): 1, 2, or 3
@@ -79,7 +80,7 @@ def classify_domain(hostname: str) -> dict:
     if not hostname:
         return {
             "tier":          3,
-            "threshold":     0.75,
+            "threshold":     SERVING_CUTOFF,
             "bypass":        False,
             "closest_match": None,
             "distance":      999
@@ -116,7 +117,7 @@ def classify_domain(hostname: str) -> dict:
 
     return {
         "tier":          3,
-        "threshold":     0.75,
+        "threshold":     SERVING_CUTOFF,
         "bypass":        False,
         "closest_match": closest,
         "distance":      min_distance
