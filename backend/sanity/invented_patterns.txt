@@ -1,0 +1,12 @@
+# Invented suspicious URL patterns on reserved example domains (example.com, .net, .org, .test, .invalid).
+# Not real sites and not dataset content.
+http://secure-paypal-login.example.com/account/verify
+https://paypal.com.account-verify.example.net/signin
+http://192.0.2.45/login.php?redirect=bank
+https://bkash-verify-account.example.org/otp
+https://login.microsoftonline.com.example.test/common/oauth2/authorize?client_id=123
+http://example.com/wp-content/uploads/chase/secure/update-password.html
+https://xn--pypal-4ve.example.com/
+http://bit.ly.example.test/a1B2c3
+https://apple-id-locked.example.invalid/unlock?session=9f8e7d
+https://www.example.com@evil.example.org/verify
