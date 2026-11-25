@@ -1,6 +1,7 @@
 import pickle
 import pandas as pd
 from feature_extractor import extract_features, features_to_vector
+from normalization import normalize_url
 
 try:
     with open("models/rf_model.pkl", "rb") as f:
@@ -20,7 +21,7 @@ except FileNotFoundError as e:
 
 def predict(url: str) -> dict:
     try:
-        features = extract_features(url)
+        features = extract_features(normalize_url(url))
         vector = features_to_vector(features)
 
         df = pd.DataFrame([vector], columns=FEATURE_COLUMNS)
